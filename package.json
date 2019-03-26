@@ -1,0 +1,27 @@
+{
+  "name": "daniels-fighting-pit",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Stencil App Starter",
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve",
+    "test": "stencil test --spec --e2e",
+    "test.watch": "stencil test --spec --e2e --watchAll",
+    "server.compile": "tsc -w src/server/server.ts",
+    "serve": "node src/server/server.js"
+  },
+  "dependencies": {
+    "@stencil/core": "~0.16.2",
+    "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
+    "rxjs": "^6.4.0",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "rollup-plugin-node-builtins": "^2.1.2"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@stencil/sass": "^0.1.1"
+  }
+}
