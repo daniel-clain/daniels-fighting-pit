@@ -13,7 +13,8 @@ export class Round {
   fight: Fight;
   private preFightTimer = 20;
   private roundNews: RoundNews[] = [];
-  constructor(roundNumber) {
+  constructor(fighters: Fighter[], roundNumber) {
+    this.fighters = fighters
     this.roundNumber = roundNumber;
     this.doPrefight()
       .then(this.doNews)

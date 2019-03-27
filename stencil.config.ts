@@ -14,7 +14,11 @@ export const config: Config = {
   nodeResolve: {
     browser: true,
     preferBuiltins: true
-  },
+  },  
+  copy: [{
+    src: require('path').resolve('./src/client/assets'),
+    dest: 'assets'
+  }],
   outputTargets: [
     {
       type: 'www',

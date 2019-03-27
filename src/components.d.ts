@@ -76,14 +76,29 @@ export namespace Components {
     'playerState'?: PlayerStates;
   }
 
-  interface FightDayTest {}
-  interface FightDayTestAttributes extends StencilHTMLAttributes {}
+  interface FightDayTest {
+    'fighters': Fighter[];
+  }
+  interface FightDayTestAttributes extends StencilHTMLAttributes {
+    'fighters'?: Fighter[];
+  }
 
   interface FighterModel {
     'fighter': Fighter;
+    'scale': number;
+    'update': number;
   }
   interface FighterModelAttributes extends StencilHTMLAttributes {
     'fighter'?: Fighter;
+    'scale'?: number;
+    'update'?: number;
+  }
+
+  interface MyTest {
+    'person': any;
+  }
+  interface MyTestAttributes extends StencilHTMLAttributes {
+    'person'?: any;
   }
 }
 
@@ -98,6 +113,7 @@ declare global {
     'PreGameLobby': Components.PreGameLobby;
     'FightDayTest': Components.FightDayTest;
     'FighterModel': Components.FighterModel;
+    'MyTest': Components.MyTest;
   }
 
   interface StencilIntrinsicElements {
@@ -110,6 +126,7 @@ declare global {
     'pre-game-lobby': Components.PreGameLobbyAttributes;
     'fight-day-test': Components.FightDayTestAttributes;
     'fighter-model': Components.FighterModelAttributes;
+    'my-test': Components.MyTestAttributes;
   }
 
 
@@ -167,6 +184,12 @@ declare global {
     new (): HTMLFighterModelElement;
   };
 
+  interface HTMLMyTestElement extends Components.MyTest, HTMLStencilElement {}
+  var HTMLMyTestElement: {
+    prototype: HTMLMyTestElement;
+    new (): HTMLMyTestElement;
+  };
+
   interface HTMLElementTagNameMap {
     'fighter-component': HTMLFighterComponentElement
     'daniels-fighting-pit': HTMLDanielsFightingPitElement
@@ -177,6 +200,7 @@ declare global {
     'pre-game-lobby': HTMLPreGameLobbyElement
     'fight-day-test': HTMLFightDayTestElement
     'fighter-model': HTMLFighterModelElement
+    'my-test': HTMLMyTestElement
   }
 
   interface ElementTagNameMap {
@@ -189,6 +213,7 @@ declare global {
     'pre-game-lobby': HTMLPreGameLobbyElement;
     'fight-day-test': HTMLFightDayTestElement;
     'fighter-model': HTMLFighterModelElement;
+    'my-test': HTMLMyTestElement;
   }
 
 

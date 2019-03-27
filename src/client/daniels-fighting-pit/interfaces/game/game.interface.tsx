@@ -23,7 +23,7 @@ export class GameInterface {
 	nextRound(roundNumber){
 		if(this.game.currentRound)
 			delete this.game.currentRound
-		this.game.currentRound = new Round(roundNumber);
+		this.game.currentRound = new Round([], roundNumber);
 		while(this.game.currentRound.state !== RoundStates['end of round'])
 		if(this.game.currentRound.roundNumber < this.game.totalRounds)
 			this.nextRound(roundNumber ++)
