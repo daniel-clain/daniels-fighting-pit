@@ -1,4 +1,4 @@
-export enum FighterStates{
+export enum FighterTacticsStates{
     'ready to fight' = 'ready to fight',
     'attacking' = 'attacking',
     'watching' = 'watching',

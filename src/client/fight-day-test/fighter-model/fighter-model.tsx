@@ -1,6 +1,7 @@
 import { Component, Prop } from '@stencil/core';
 import { Fighter } from '../../../classes/fighter/fighter';
 import { FighterModelImage } from '../../../models/fighterModelImage';
+import { FacingDirections } from '../../../enums/facingDirections';
 
 
 @Component({
@@ -21,12 +22,13 @@ export class FighterModel {
 			bottom: `${y}px`
 		}
 
-		let fmi: FighterModelImage = this.fighter.fighterModelImages.find(image => image.matchingState === this.fighter.fighterState)
+		let fmi: FighterModelImage = this.fighter.fighterModelImages.find(image => image.modelState === this.fighter.fighterModelState)
 		const {width, height} = fmi.dimensions
 
 		const fighterImageStyle = {
 			width: `${width}px`,
 			height: `${height}px`,
+			transform: `${this.fighter.facingDirectionState == FacingDirections.left ? 'scalex(-1)' : 'none'}`,
 			backgroundImage: `url(../../assets/fighter-images/${fmi.imageName})`
 		}
 		return (
