@@ -1,4 +1,4 @@
-export enum FacingDirections{
+export enum LeftOrRight{
   'left' = 'left',
   'right' = 'right'
 }

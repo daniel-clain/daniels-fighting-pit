@@ -1,6 +1,7 @@
+import {AttackResults} from './../../enums/attackResults';
+import {FighterAttack} from './../../models/fighterAttack';
+import {LeftOrRight} from './../../enums/leftOrRight';
 import {FighterModelStates} from './../../enums/fighterModelStates';
-
-import {FacingDirections} from './../../enums/facingDirections';
 import {Edges} from './../../enums/edges';
 import { FighterTacticsStates } from "../../enums/fighterTacticsStates";
 import { Position } from "../../models/position";
@@ -10,6 +11,8 @@ import { rand } from "../../helper-functions/helper-functions";
 import { Dimensions } from "../../models/dimensions";
 import { ArenaInfo } from "../../models/arenaInfo";
 import { FighterModelImage } from "../../models/fighterModelImage";
+import { FighterStates } from '../../enums/fighterStates';
+import { Hit } from '../../models/hit';
 class ModelEdgeVals{
   top: number;
   left: number
@@ -20,24 +23,33 @@ class ModelEdgeVals{
 export class Fighter {
   pos: Position 
   name: string
-  fighterTacticsState: FighterTacticsStates
-  fighterModelState: FighterModelStates
-  facingDirectionState: FacingDirections
+  state: FighterStates
+  tacticsState: FighterTacticsStates
+  modelState: FighterModelStates
+  facingDirectionState: LeftOrRight
   arenaDimensions: Dimensions
-  watchOtherFighters: Subscription[]
+  watchOtherFightersSubscriptions: Subscription[]
 
-  movingInDirection: number;
-  stateSubj: Subject<FighterTacticsStates> = new Subject();
+  tacticsStateSubj: Subject<FighterTacticsStates> = new Subject();
   modelUpdateSubj: Subject<any> = new Subject()
   movementSubj: Subject<Fighter> = new Subject();
   fighterLevels: FighterLevels = {
     stamina: 100,
     spirit: 100,
   };
+  recoveryTimes = {
+    punch: 700,
+    block: 500,
+    dodge: 500,
+    takeAHit: 700
+  }
 
-  strength: number;
-  speed: number;
-  aggression: number;
+  strength: number
+  speed: number
+  aggression: number
+  stamina: number
+
+  private _movingDirection: number
 
   
 	fighterModelImages: FighterModelImage[] = [
@@ -78,13 +90,14 @@ export class Fighter {
     this.name = name
     this.pos = pos
     this.speed = speed
-    this.fighterTacticsState = FighterTacticsStates['ready to fight'];
-    this.fighterModelState = FighterModelStates['idle'];
+    this.stamina = 2
+    this.tacticsState = FighterTacticsStates['attacking'];
+    this.modelState = FighterModelStates['idle'];
     this.setRandomProperties()
   }
 
   getModelEdgeVals(): ModelEdgeVals{
-    const modelDimensions: Dimensions = this.fighterModelImages.find(image => image.modelState == this.fighterModelState).dimensions
+    const modelDimensions: Dimensions = this.fighterModelImages.find(image => image.modelState == this.modelState).dimensions
     let modelEdgeVals: ModelEdgeVals = {
       left: this.pos.x,
       top: this.pos.y,
@@ -97,9 +110,14 @@ export class Fighter {
 
 	fight(arenaInfo: ArenaInfo, otherFighters: Fighter[]){
     this.arenaDimensions = arenaInfo.dimensions
-    this.watchOtherFighters = otherFighters.map(fighter => fighter.movementSubj.subscribe(fighter => this.onOtherFighterMovements(fighter)))
+    this.watchOtherFighters(otherFighters)
     arenaInfo.dimensionUpdates.subscribe(dimensions => this.arenaDimensions = dimensions)
 		this.doThing()
+  }
+
+  private watchOtherFighters(otherFighters: Fighter[]){
+    this.watchOtherFightersSubscriptions = otherFighters.map(fighter => fighter.movementSubj.subscribe(fighter => this.respondToOtherFighterMovements(fighter)))
+    
   }
   
   private checkIfCloseTo(edge: Edges, thisVals: ModelEdgeVals, otherVals: ModelEdgeVals): boolean{
@@ -128,75 +146,174 @@ export class Fighter {
     }
 
   }
-  
-  private onOtherFighterMovements(fighter: Fighter){
+
+  private otherFighterIsClose(fighter: Fighter): LeftOrRight{
     const thisEdgeVals: ModelEdgeVals = this.getModelEdgeVals()
     const otherEdgeVals: ModelEdgeVals = fighter.getModelEdgeVals()
-    let fighterClose = false
     const isCloseToLeft = this.checkIfCloseTo(Edges.left, thisEdgeVals, otherEdgeVals)
     const isCloseToRight = this.checkIfCloseTo(Edges.right, thisEdgeVals, otherEdgeVals)
+
     if(isCloseToLeft){
-      fighterClose = true
-      this.facingDirectionState = FacingDirections['left']
-      this.modelUpdateSubj.next()
-      //console.log(`${fighter.name} is to the left of ${this.name}`);
+      return LeftOrRight['left']
     }
     if(isCloseToRight){
-      fighterClose = true
-      this.facingDirectionState = FacingDirections['right']
-      this.modelUpdateSubj.next()
-      //console.log(`${fighter.name} is to the right of ${this.name}`);
+      return LeftOrRight['right']
     }
-    
-    if(fighterClose){
-      
-      const chanceToAttack = rand(5)
-      if(chanceToAttack > 3){
-        //console.log(`${this.name} is close to ${fighter.name}`);
-        if(this.fighterModelState == FighterModelStates['idle']){
+  }
+
+  private respondToCloseFighter(fighter: Fighter, otherFighterSide: LeftOrRight){
+    const facingOtherFighter: boolean = otherFighterSide == this.facingDirectionState
+    if(facingOtherFighter){
+
+      switch(this.tacticsState){
+        case FighterTacticsStates['attacking'] : 
           this.tryToHitFighter(fighter)
-        }
+          break;
+        case FighterTacticsStates['defending'] :
+          this.prepareToBlockOrDodge()
+          break;
+        case FighterTacticsStates['keeping away'] : 
+          this.movingDirection = 9
+          break;
+      }
+    } else {
+      const chanceToTurnAndFaceOtherFighter = rand(1)
+      if(chanceToTurnAndFaceOtherFighter){
+        this.updateFacingDirection(otherFighterSide)
       }
     }
+  }
+
+  private prepareToBlockOrDodge(){
+
+  }
+  
+  private respondToOtherFighterMovements(fighter: Fighter){
+    if(this.modelState !== FighterModelStates['idle']) return
+
+    const otherFighterIsClose: LeftOrRight = this.otherFighterIsClose(fighter)
+    if(otherFighterIsClose){
+      this.respondToCloseFighter(fighter, otherFighterIsClose)
+    }
+  }
+
+  private awaitRecoveryTime(recoveryTime: number): Promise<any>{
+    return new Promise(resolve => setTimeout(() => resolve(), recoveryTime))
   }
 
   private tryToHitFighter(fighter: Fighter){
-    this.fighterModelState = FighterModelStates['punching']
-    fighter.incommingAttack(this)
-    setTimeout(() => this.backToNormal(), 700)
+    this.updateModelState(FighterModelStates['punching'])
+    const attack: FighterAttack = {
+      speed: this.speed,
+      strength: this.strength
+    }
+    const result: AttackResults = fighter.getAttacked(this, attack)
+
+    this.awaitRecoveryTime(this.recoveryTimes.punch)
+    .then(() => this.afterTryToHitFighter(result))
+
   }
 
-  private backToNormal(){
-    if(this.fighterTacticsState !== FighterTacticsStates['down and out']){
-      this.fighterModelState = FighterModelStates['idle']
-      this.doThing()
+  afterTryToHitFighter(result: AttackResults){
+    if(result == AttackResults['critical']){
+      this.stamina = this.stamina + 1
+    }
+    this.backToNormal()
+  }
+
+
+  private dodge(fighterAttack: FighterAttack): boolean {
+    const randomNumber: number = rand(10)
+
+    const speedDifference: number = this.speed - fighterAttack.speed
+    if(speedDifference == 2){
+      return randomNumber < 6
+    }
+    if(speedDifference == 1){
+      return randomNumber < 5
+    }
+    if(speedDifference == 0){
+      return randomNumber < 4
+    }
+    if(speedDifference == -1){
+      return randomNumber < 3
+    }
+    if(speedDifference == -2){
+      return randomNumber < 2
     }
   }
 
-  incommingAttack(fighter: Fighter){
-    const dodgeChance = rand(1)
-    if(dodgeChance){
+  private block(fighterAttack: FighterAttack): boolean {
+    const randomNumber: number = rand(10)
+
+    const strengthDifference: number = this.strength - fighterAttack.strength
+    if(strengthDifference == 2){
+      return randomNumber < 6
+    }
+    if(strengthDifference == 1){
+      return randomNumber < 5
+    }
+    if(strengthDifference == 0){
+      return randomNumber < 4
+    }
+    if(strengthDifference == -1){
+      return randomNumber < 3
+    }
+    if(strengthDifference == -2){
+      return randomNumber < 2
+    }
+  }
+
+
+  getAttacked(fighter: Fighter, fighterAttack: FighterAttack): AttackResults{
+    if(this.dodge(fighterAttack)){
       console.log(`${fighter.name}'s attack was dodged by ${this.name}`);
-      this.fighterModelState = FighterModelStates['dodging']
-      setTimeout(() => this.backToNormal(), 800)
+      this.updateModelState(FighterModelStates['dodging'])
+      this.awaitRecoveryTime(this.recoveryTimes.dodge)
+      .then(() => this.afterDodge())
+      return AttackResults['dodged']
     } else {
-      const blockChance = rand(1)
-      if(blockChance){
+      if(this.block(fighterAttack)){
         console.log(`${fighter.name}'s attack was blocked by ${this.name}`);
-        this.fighterModelState = FighterModelStates['blocking']
-        setTimeout(() => this.backToNormal(), 500)
+        this.updateModelState(FighterModelStates['blocking'])
+        this.awaitRecoveryTime(this.recoveryTimes.block)
+        .then(() => this.afterBlock())
+        return AttackResults['blocked']
       } else {
+        const hit: Hit = {damage: 1}
         console.warn(`${fighter.name}'s attack hit ${this.name}`);
-        this.fighterModelState = FighterModelStates['taking a hit']
-        setTimeout(() => this.getKnockedOut(), 800)
+        this.awaitRecoveryTime(this.recoveryTimes.block)
+        .then(() => this.justTookAHit(hit))
+        return AttackResults['hit']
       }
+    }
+  }
+
+  private afterDodge(){
+    this.backToNormal()
+  }
+  private afterBlock(){
+    this.backToNormal()
+  }
+
+  private justTookAHit(hit: Hit){
+    this.stamina = this.stamina - hit.damage
+    if(this.stamina <= 0){
+      this.getKnockedOut()
+    } else {
+      this.backToNormal()
     }
   }
 
   private getKnockedOut(){
-    this.watchOtherFighters.forEach(subscription => subscription.unsubscribe())
-    this.fighterModelState = FighterModelStates["down and out"]
-    this.fighterTacticsState = FighterTacticsStates["down and out"]
+    this.watchOtherFightersSubscriptions.forEach(subscription => subscription.unsubscribe())
+    this.updateModelState(FighterModelStates['down and out'])
+    this.tacticsState = null
+  }
+
+  private backToNormal(){
+    this.updateModelState(FighterModelStates['idle'])
+    this.doThing()
   }
   
 
@@ -204,7 +321,7 @@ export class Fighter {
 		return new Promise((resolve) => {
 			this.walkRandomDirection(rand(3))
 			.then(() => {
-        if(this.fighterModelState == FighterModelStates['idle'])
+        if(this.modelState == FighterModelStates['idle'])
         this.doThing(); 
         resolve()
       })
@@ -213,21 +330,42 @@ export class Fighter {
 	}
 	setFacingDirectionByDegree(directionDegree){
     if(directionDegree < 18){
-      if(this.facingDirectionState != FacingDirections.right ){
-        this.updateFacingDirection(FacingDirections.right)
+      if(this.facingDirectionState != LeftOrRight.right ){
+        this.updateFacingDirection(LeftOrRight.right)
       }
     } else {
-      if(this.facingDirectionState != FacingDirections.left ){
-        this.updateFacingDirection(FacingDirections.left)
+      if(this.facingDirectionState != LeftOrRight.left ){
+        this.updateFacingDirection(LeftOrRight.left)
       }
     }
 
   }
+  
+  updateModelState(state: FighterModelStates){
+    this.modelState = state
+    this.modelUpdateSubj.next()
+  }
 
-  updateFacingDirection(dir: FacingDirections){
+  updateFacingDirection(dir: LeftOrRight){
     this.facingDirectionState = dir
     this.modelUpdateSubj.next()
 
+  }
+
+  move(){
+    const randomDuration = rand(4, true)
+    
+
+  }
+
+  private set movingDirection(direction){
+    if(direction < 0 || direction >= 36){
+      throw `invalid moving direction ${direction}`
+    }
+    this._movingDirection = direction
+  }
+  private get movingDirection(){
+    return this._movingDirection
   }
 
 	async walkRandomDirection(forXseconds: number){
@@ -243,7 +381,7 @@ export class Fighter {
 				let xPercent = 10;
 				let yPercent = 10;
 				let val
-				if(rd > 0 && rd < 9){
+				if(rd >= 0 && rd < 9){
 					val = rd - 0			
 					xPercent = val/.09
 					yPercent = 100 - val/.09
@@ -292,7 +430,7 @@ export class Fighter {
 			const moveABitRepeat = () => {
 				walkABit()
 				.then(() => {					
-					if(!timesUp && this.fighterModelState == FighterModelStates['idle']){
+					if(!timesUp && this.modelState == FighterModelStates['idle']){
 						moveABitRepeat()
 					} else {
 						resolveWalking()
