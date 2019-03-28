@@ -74,9 +74,10 @@ export class Fighter {
 	]
 
 
-  constructor(name: string, pos: Position) {
+  constructor(name: string, pos: Position, speed: number) {
     this.name = name
     this.pos = pos
+    this.speed = speed
     this.fighterTacticsState = FighterTacticsStates['ready to fight'];
     this.fighterModelState = FighterModelStates['idle'];
     this.setRandomProperties()
@@ -102,8 +103,9 @@ export class Fighter {
   }
   
   private checkIfCloseTo(edge: Edges, thisVals: ModelEdgeVals, otherVals: ModelEdgeVals): boolean{
-    const space = 10
-    const other40 = (thisVals.top - thisVals.bottom) * 0.4
+    const space = 20
+    const other80 = (otherVals.top - otherVals.bottom) * 0.8
+    const this80 = (thisVals.top - thisVals.bottom) * 0.8
     /* console.log(`LEFT: otherVals.left: ${otherVals.left} < thisVals.left: ${thisVals.left} &&
     otherVals.right: ${otherVals.right} > thisVals.left - space: ${thisVals.left - space}`); */
 
@@ -111,7 +113,7 @@ export class Fighter {
     otherVals.top: ${otherVals.top} > thisVals.bottom: ${thisVals.bottom}`); */
     if(edge == Edges.left){
       if(((otherVals.left < thisVals.left) && (otherVals.right > (thisVals.left - space))) && 
-      (otherVals.bottom + other40 < thisVals.top && otherVals.top - other40 > thisVals.bottom)){
+      ((otherVals.bottom + other80) < thisVals.top && otherVals.top  > (thisVals.bottom + this80))){
         return true
       }
     }
@@ -120,7 +122,7 @@ export class Fighter {
     otherVals.left: ${otherVals.left} < thisVals.right + space: ${thisVals.right + space}`); */
     if(edge == Edges.right){
       if((otherVals.right > thisVals.right && otherVals.left < (thisVals.right + space)) && 
-      (otherVals.bottom + other40 < thisVals.top && otherVals.top - other40 > thisVals.bottom)){
+      ((otherVals.bottom + other80) < thisVals.top && otherVals.top  > (thisVals.bottom + this80))){
         return true
       }
     }
@@ -137,13 +139,13 @@ export class Fighter {
       fighterClose = true
       this.facingDirectionState = FacingDirections['left']
       this.modelUpdateSubj.next()
-      console.log(`${fighter.name} is to the left of ${this.name}`);
+      //console.log(`${fighter.name} is to the left of ${this.name}`);
     }
     if(isCloseToRight){
       fighterClose = true
       this.facingDirectionState = FacingDirections['right']
       this.modelUpdateSubj.next()
-      console.log(`${fighter.name} is to the right of ${this.name}`);
+      //console.log(`${fighter.name} is to the right of ${this.name}`);
     }
     
     if(fighterClose){
@@ -154,7 +156,6 @@ export class Fighter {
         if(this.fighterModelState == FighterModelStates['idle']){
           this.tryToHitFighter(fighter)
         }
-        
       }
     }
   }
@@ -174,13 +175,13 @@ export class Fighter {
 
   incommingAttack(fighter: Fighter){
     const dodgeChance = rand(1)
-    if(dodgeChance == 0){
+    if(dodgeChance){
       console.log(`${fighter.name}'s attack was dodged by ${this.name}`);
       this.fighterModelState = FighterModelStates['dodging']
       setTimeout(() => this.backToNormal(), 800)
     } else {
       const blockChance = rand(1)
-      if(blockChance == 0){
+      if(blockChance){
         console.log(`${fighter.name}'s attack was blocked by ${this.name}`);
         this.fighterModelState = FighterModelStates['blocking']
         setTimeout(() => this.backToNormal(), 500)

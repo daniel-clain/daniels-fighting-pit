@@ -2,6 +2,7 @@ import { Component, Prop } from '@stencil/core';
 import { Fighter } from '../../../classes/fighter/fighter';
 import { FighterModelImage } from '../../../models/fighterModelImage';
 import { FacingDirections } from '../../../enums/facingDirections';
+import { FighterModelStates } from '../../../enums/fighterModelStates';
 
 
 @Component({
@@ -19,7 +20,8 @@ export class FighterModel {
 		const {x, y} = this.fighter.pos
 		const movement = {
 			left: `${x}px`,
-			bottom: `${y}px`
+			bottom: `${y}px`,
+			zIndex: `${this.fighter.fighterModelState == FighterModelStates['down and out'] ? '0' : '1'}`
 		}
 
 		let fmi: FighterModelImage = this.fighter.fighterModelImages.find(image => image.modelState === this.fighter.fighterModelState)
