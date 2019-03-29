@@ -9,7 +9,7 @@ import { ServerToClientEmits } from "../enums/serverToClientEmits";
 import { Game } from "../classes/game/game";
 
 const connectedSockets: Socket[] = []
-const players: Player[] = []
+let players: Player[] = []
 let playersQueuingForAGame: Player[] = []
 let playerReadyGroups: PlayersReadyGroup[] = []
 
@@ -26,7 +26,10 @@ const handleNewPlayerConnected = (socket: Socket) => {
   io.emit('aonther user has connected')
   socket.emit('connected')
   socket.on('disconnect', () => {
+    players = players.filter(player => player.socketId !== socket.id)
     io.emit('aonther user has disconnected')
+    console.log(`${socket.id} disconnected!`);    
+
   })
   socket.on(ClientToServerEmits['que for game'], () => {
     const player: Player = players.find(player => player.socketId === socket.id)
@@ -113,9 +116,8 @@ const enoughPlayersForGame = (players: Player[]) => {
   playerReadyGroups.push(playersReadyGroup)
     players.forEach(player => {
       const socket: Socket = connectedSockets.find(socket => socket.id == player.socketId)
-      player.playerState = PlayerStates['game ready']
       socket.emit(ServerToClientEmits['enough players for game'], {groupId: playersReadyGroup.groupId})   
-      socket.emit(ServerToClientEmits['player state update'], player.playerState) 
+      updatePlayerState(player.socketId, PlayerStates['game ready'])
   })
 }
 
