@@ -1,6 +1,8 @@
 import { Component, Prop } from '@stencil/core';
 import { Fighter } from '../../../classes/fighter/fighter';
 import { FighterModelImage } from '../../../models/fighterModelImage';
+import { LeftOrRight } from '../../../enums/leftOrRight';
+import { FighterModelStates } from '../../../enums/fighterModelStates';
 
 
 @Component({
@@ -18,15 +20,17 @@ export class FighterModel {
 		const {x, y} = this.fighter.pos
 		const movement = {
 			left: `${x}px`,
-			bottom: `${y}px`
+			bottom: `${y}px`,
+			zIndex: `${this.fighter.modelState == FighterModelStates['down and out'] ? '0' : '1'}`
 		}
 
-		let fmi: FighterModelImage = this.fighter.fighterModelImages.find(image => image.matchingState === this.fighter.fighterState)
+		let fmi: FighterModelImage = this.fighter.fighterModelImages.find(image => image.modelState === this.fighter.modelState)
 		const {width, height} = fmi.dimensions
 
 		const fighterImageStyle = {
 			width: `${width}px`,
 			height: `${height}px`,
+			transform: `${this.fighter.facingDirectionState == LeftOrRight.left ? 'scalex(-1)' : 'none'}`,
 			backgroundImage: `url(../../assets/fighter-images/${fmi.imageName})`
 		}
 		return (

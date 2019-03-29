@@ -4,7 +4,6 @@ import { Dimensions } from '../../models/dimensions';
 import { Subject } from 'rxjs';
 import { ArenaInfo } from '../../models/arenaInfo';
 
-
 @Component({
 	tag: 'fight-day-test',
 	shadow: true
@@ -40,7 +39,7 @@ export class FightDayTest {
 		this.fighters.forEach((fighter: Fighter) => {
 			const otherFighters = this.fighters.filter(f => f.name != fighter.name)
 			fighter.fight(arenaInfo, otherFighters)
-			fighter.movementSubj.subscribe(() => this.onFighterUpdate())
+			fighter.modelUpdateSubj.subscribe(() => this.onFighterUpdate())
 		})		
 	}
 

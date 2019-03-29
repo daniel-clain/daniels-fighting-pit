@@ -1,8 +1,8 @@
 import { Dimensions } from "./dimensions";
-import { FighterStates } from "../enums/fighterStates";
+import { FighterModelStates } from '../enums/fighterModelStates';
 
 export class FighterModelImage{
-	matchingState: FighterStates
+	modelState: FighterModelStates
 	dimensions: Dimensions
 	imageName: string
 }

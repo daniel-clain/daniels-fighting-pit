@@ -1,9 +1,8 @@
 export enum FighterStates{
-    'ready to fight' = 'ready to fight',
-    'attacking' = 'attacking',
-    'watching' = 'watching',
-    'defending' = 'defending',
-    'keeping away' = 'keeping away',
-    'trying to recover' = 'trying to recover',
-    'down and out' = 'down and out'
+  'in fight' = 'in fight',
+  'dead' = 'dead',
+  'injured' = 'injured',
+  'doped up' = 'doped up',
+  'sick' = 'sick',
+  'retired' = 'retired'
 }

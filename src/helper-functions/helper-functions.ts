@@ -1,1 +1,1 @@
-export const rand = number =>  Math.round(Math.random() * number)
+export const rand = (number, startAtOne?) =>  Math.round(Math.random() * number + (startAtOne ? 1 : 0))
