@@ -33,11 +33,21 @@ export class FighterModel {
 			transform: `${this.fighter.facingDirectionState == LeftOrRight.left ? 'scalex(-1)' : 'none'}`,
 			backgroundImage: `url(../../assets/fighter-images/${fmi.imageName})`
 		}
-		return (
+		return ([
+			<div class="preloaded-images">
+				<img src="assets/fighter-images/block.png" />
+				<img src="assets/fighter-images/dodge.png" />
+				<img src="assets/fighter-images/down-and-out.png" />
+				<img src="assets/fighter-images/idle.png" />
+				<img src="assets/fighter-images/punch.png" />
+				<img src="assets/fighter-images/recover.png" />
+				<img src="assets/fighter-images/take-hit.png" />
+				<img src="assets/fighter-images/walking.png" />
+			</div>,
 			<div class="fighter" style={movement}>
 				<div class="fighter-name">{this.fighter.name}</div>
-				<div class="fighter-image" style={fighterImageStyle}></div>
+				<div class="fighter-image__" style={fighterImageStyle}></div>
 			</div>
-		)
+		])
 	}
 }

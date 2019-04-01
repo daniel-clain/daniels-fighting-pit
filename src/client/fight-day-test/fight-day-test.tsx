@@ -40,6 +40,7 @@ export class FightDayTest {
 			const otherFighters = this.fighters.filter(f => f.name != fighter.name)
 			fighter.fight(arenaInfo, otherFighters)
 			fighter.modelUpdateSubj.subscribe(() => this.onFighterUpdate())
+			fighter.movementSubj.subscribe(() => this.onFighterUpdate())
 		})		
 	}
 

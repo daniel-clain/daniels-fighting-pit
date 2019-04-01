@@ -1,0 +1,4 @@
+* make websockets perfect, queing, connection lost, page refresh, 
+* get app working in local non websockets mock first
+* fix diagonal slowness
+* long term lag memory leak

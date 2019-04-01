@@ -1,7 +1,8 @@
 export enum FighterTacticsStates{
-    'attacking' = 'attacking',
-    'watching' = 'watching',
-    'defending' = 'defending',
+    'attack' = 'attack',
+    'watch' = 'watch',
+    'defend' = 'defend',
     'keeping away' = 'keeping away',
-    'trying to recover' = 'trying to recover'
+    'recover' = 'recover',
+    'wander around' = 'wander around'
 }

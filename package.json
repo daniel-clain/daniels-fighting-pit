@@ -6,23 +6,30 @@
   "scripts": {
     "build": "stencil build",
     "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll",
+    "test": "stencil test --spec",
+    "test.watch": "stencil test --spec --watchAll",
     "server.compile": "tsc -w src/server/server.ts",
-    "serve": "node src/server/server.js"
+    "serve": "node src/server/server.js",
+    "test.jest": "jest"
   },
   "dependencies": {
     "@stencil/core": "~0.16.2",
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "rxjs": "^6.4.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "rollup-plugin-node-builtins": "^2.1.2"
+    "ts-jest": "^24.0.0"
   },
   "license": "MIT",
   "devDependencies": {
     "@stencil/sass": "^0.1.1",
+    "@types/jest": "23.3.14",
+    "@types/puppeteer": "1.6.4",
+    "jest": "23.6.0",
+    "jest-cli": "23.6.0",
+    "puppeteer": "1.8.0",
     "workbox-build": "3.4.1"
   }
 }

@@ -8,7 +8,7 @@ import { Fighter } from '../../classes/fighter/fighter';
 
 @Component({
   tag: 'daniels-fighting-pit',
-  styleUrl: 'daniels-fighting-pit.css',
+  styleUrl: 'daniels-fighting-pit.scss',
   shadow: true
 })
 export class DanielsFightingPit {
@@ -19,16 +19,17 @@ export class DanielsFightingPit {
   game: Game;
   
 	fighters: Fighter[] = [
-    new Fighter('Daniel', {x:20, y:180}, 3),
-    new Fighter('Angelo', {x:220, y:220}, 1),
-    new Fighter('Tomasz', {x:480, y:380}, 1),
-    new Fighter('Hassan', {x:180, y:120}, 1),
-    new Fighter('Alex', {x:120, y:380}, 1),
-    new Fighter('Paul', {x:420, y:220}, 1),
-    new Fighter('Suluman', {x:320, y:220}, 1),
-    new Fighter('Mark', {x:380, y:280}, 1),
-    new Fighter('Mat', {x:280, y:220}, 1),
-    new Fighter('Dardan', {x:320, y:380}, 1)
+    new Fighter('Daniel', {x:20, y:180}, 3, 3),
+    new Fighter('Angelo', {x:220, y:220}, 1, 1),
+    new Fighter('Tomasz', {x:480, y:380}, 3, 3),
+    new Fighter('Hassan', {x:180, y:120}, 3, 3), 
+    new Fighter('Alex', {x:120, y:380}, 1, 1),
+    new Fighter('Paul', {x:420, y:220}, 1, 1),
+    new Fighter('Suluman', {x:320, y:220}, 1, 1),
+    new Fighter('Mark', {x:380, y:280}, 1, 1),/*
+    new Fighter('Mat', {x:280, y:220}, 1, 1),
+    new Fighter('Dardan', {x:320, y:380}, 1, 1),
+    new Fighter('Mike', {x:420, y:120}, 1, 1) */
   ]
   
   
