@@ -1,7 +1,6 @@
 import { Component, Prop } from '@stencil/core';
 import { Fighter } from '../../../classes/fighter/fighter';
 import { FighterModelImage } from '../../../models/fighterModelImage';
-import { LeftOrRight } from '../../../enums/leftOrRight';
 import { FighterModelStates } from '../../../enums/fighterModelStates';
 
 
@@ -17,12 +16,13 @@ export class FighterModel {
 
 	
 	render() {
-		const {x, y} = this.fighter.pos
+		const {x, y} = this.fighter.position
 		const movement = {
 			left: `${x}px`,
 			bottom: `${y}px`,
-			zIndex: `${this.fighter.modelState == FighterModelStates['down and out'] ? '0' : '1'}`
+			zIndex: `${this.fighter.modelState == FighterModelStates['down and out'] ? '0' : 1000-y}`
 		}
+		
 
 		let fmi: FighterModelImage = this.fighter.fighterModelImages.find(image => image.modelState === this.fighter.modelState)
 		const {width, height} = fmi.dimensions
@@ -30,9 +30,11 @@ export class FighterModel {
 		const fighterImageStyle = {
 			width: `${width}px`,
 			height: `${height}px`,
-			transform: `${this.fighter.facingDirectionState == LeftOrRight.left ? 'scalex(-1)' : 'none'}`,
+			transform: `${this.fighter.facingDirection == 'left' ? 'scalex(-1)' : 'none'}`,
 			backgroundImage: `url(../../assets/fighter-images/${fmi.imageName})`
 		}
+		
+		
 		return ([
 			<div class="preloaded-images">
 				<img src="assets/fighter-images/block.png" />

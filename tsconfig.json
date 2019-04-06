@@ -14,12 +14,15 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",
-    "jsxFactory": "h"
+    "jsxFactory": "h",
+    "outDir": "./lib"
   },
   "include": [
     "src"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "lib"
   ]
+  
 }

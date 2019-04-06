@@ -25,6 +25,7 @@ export class FightDayTest {
 			height: window.innerHeight
 		}
 	}
+	fightStartSubject: Subject<any> = new Subject()
 
 	componentDidLoad(){		
 		this.windowDimensions = {
@@ -38,10 +39,11 @@ export class FightDayTest {
 		}
 		this.fighters.forEach((fighter: Fighter) => {
 			const otherFighters = this.fighters.filter(f => f.name != fighter.name)
-			fighter.fight(arenaInfo, otherFighters)
+			fighter.giveFightInfo(arenaInfo, otherFighters, this.fightStartSubject)
 			fighter.modelUpdateSubj.subscribe(() => this.onFighterUpdate())
 			fighter.movementSubj.subscribe(() => this.onFighterUpdate())
-		})		
+		})	
+		this.fightStartSubject.next()
 	}
 
 	onFighterUpdate(){

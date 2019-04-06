@@ -1,0 +1,1 @@
+export type MinorActions = 'recovering' | 'defending' | 'walking'
