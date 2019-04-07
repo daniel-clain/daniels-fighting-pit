@@ -1,10 +1,8 @@
-import { AttackResults } from './../../enums/attackResults';
-import { FighterAttack } from './../../models/fighterAttack';
-import { FighterModelStates } from './../../enums/fighterModelStates';
+
 import { Position } from "../../models/position";
 import { FighterLevels } from "../../models/fighterLevels";
 import { Subject, Subscription } from "rxjs";
-import { helperFunctions as h } from "../../helper-functions/helper-functions";
+import { random } from "../../helper-functions/helper-functions";
 import { Dimensions } from "../../models/dimensions";
 import { FighterModelImage } from "../../models/fighterModelImage";
 import { Hit } from '../../models/hit';
@@ -16,37 +14,35 @@ import { Direction360 } from '../../types/movingDirection';
 import { ModelEdgeVals } from '../../models/modelEdgeVals';
 import { MajorActions } from '../../types/majorActions';
 import { MinorActions } from '../../types/minorActions';
-
-
+import { ResponseToFighterAttack } from '../../types/responseToFighterAttack';
+import { FighterStates } from "../../types/fighterStates";
 
 export class Fighter {
   position: Position
   name: string
-  modelState: FighterModelStates
+  state: FighterStates
+  modelState: MajorActions | MinorActions | FighterStates
   facingDirection: FacingDirection
   arenaDimensions: Dimensions
   maxStamina = 4
+  maxSpirit = 4
   knockedOut = false
   actionInterval: NodeJS.Timeout
 
   modelUpdateSubj: Subject<any> = new Subject()
   movementSubj: Subject<Fighter> = new Subject();
-  otherFighterSubscriptions: Subscription[]
-  fighterLevels: FighterLevels = {
-    stamina: 100,
-    spirit: 100,
-  };
 
   recoveryVal: number
   strength: number
   speed: number
   aggression: number
+  intelligence: number
+  pride: number
+  spirit: number
   stamina: number
   otherFightersInTheFight: Fighter[]
   fightersToTheLeft: Fighter[] = []
   fightersToTheRight: Fighter[] = []
-
-  
 
   //////////////////////////////
 
@@ -80,16 +76,16 @@ export class Fighter {
   
   animationTimes = {
     punch: .7,
-    block: .7,
-    dodge: .7,
-    takeAHit: .3
+    block: .6,
+    dodge: .6,
+    takeAHit: .4
   }
 
   cooldowns = {
-    punch: .5,
+    punch: .6,
     block: .3,
     dodge: .3,
-    takeAHit: .1
+    takeAHit: .4
   }
 
   //////////////////////////////  
@@ -127,66 +123,77 @@ export class Fighter {
     name => `${name} won the fight, congratulations, your prize is you get to work on the talk talk PHP back end, hahah suck a bag of dicks`,
   ]
 
-  
-
   fighterModelImages: FighterModelImage[] = [
     {
-      modelState: FighterModelStates['idle'],
+      modelState: 'active',
       dimensions: { width: 58, height: 92 },
       imageName: 'idle.png'
     },
     {
-      modelState: FighterModelStates['punching'],
+      modelState: 'punching',
       dimensions: { width: 63, height: 79 },
       imageName: 'punch.png'
     },
     {
-      modelState: FighterModelStates['down and out'],
+      modelState: 'critical striking',
+      dimensions: { width: 63, height: 79 },
+      imageName: 'punch.png'
+    },
+    {
+      modelState: 'knocked out',
       dimensions: { width: 80, height: 40 },
       imageName: 'down-and-out.png'
     },
     {
-      modelState: FighterModelStates['dodging'],
+      modelState: 'dodging',
       dimensions: { width: 49, height: 79 },
       imageName: 'dodge.png'
     },
     {
-      modelState: FighterModelStates['blocking'],
+      modelState: 'blocking',
       dimensions: { width: 53, height: 74 },
       imageName: 'block.png'
     },
     {
-      modelState: FighterModelStates['taking a hit'],
+      modelState: 'defending',
+      dimensions: { width: 53, height: 74 },
+      imageName: 'block.png'
+    },
+    {
+      modelState: 'taking a hit',
       dimensions: { width: 56, height: 83 },
       imageName: 'take-hit.png'
     },
     {
-      modelState: FighterModelStates['walking'],
+      modelState: 'walking',
       dimensions: { width: 41, height: 93 },
       imageName: 'walking.png'
     },
     {
-      modelState: FighterModelStates['recovering'],
+      modelState: 'recovering',
       dimensions: { width: 45, height: 67 },
       imageName: 'recover.png'
     }
   ]
 
-
-  constructor(name: string, position: Position, speed: number, strength: number) {
+  constructor(name: string, position: Position, speed: number, strength: number, aggression: number, intelligence: number, pride: number) {
     this.name = name
     this.position = position
     this.speed = speed
     this.strength = strength
+    this.aggression = aggression
+    this.intelligence = intelligence
+    this.pride = pride
     this.stamina = 4
-    this.updateFacingDirection(h.random(1) ? 'left' : 'right')
-    this.modelState = FighterModelStates['idle'];
-
+    this.spirit = 2
+    this.updateFacingDirection(random(1) ? 'left' : 'right')
+    this.modelState = 'active'
   }
-
 
   getModelEdgeVals(): ModelEdgeVals {
     const modelDimensions: Dimensions = this.fighterModelImages.find(image => image.modelState == this.modelState).dimensions
+    if(!modelDimensions)
+      debugger
     let modelEdgeVals: ModelEdgeVals = {
       left: this.position.x,
       top: this.position.y,
@@ -205,7 +212,20 @@ export class Fighter {
     })
   }
 
+  victory(){
+    clearInterval(this.actionInterval)
+    const victoryExpression = this.victoryExpressions[random(this.victoryExpressions.length - 1)]
+    
+    var victorySpeech = new SpeechSynthesisUtterance(victoryExpression(this.name));
+    this.speak(victorySpeech)
+
+  }
+
+  speak(msg: SpeechSynthesisUtterance){
+    window.speechSynthesis.speak(msg);
+  }
   
+  //////////////////////////////////////////
 
   canSeeAllFighters(facingDirection: FacingDirection): boolean {
     if (this.facingDirection == facingDirection && 
@@ -256,7 +276,6 @@ export class Fighter {
   
   turnAround() {
     this.updateFacingDirection(this.facingDirection == 'left' ? 'right' : 'left')
-    this.modelUpdateSubj.next()
   }
 
   getClosestFighter(): Fighter {
@@ -276,19 +295,6 @@ export class Fighter {
     else {
       this.victory()
     }
-  }
-
-  victory(){
-    clearInterval(this.actionInterval)
-    const victoryExpression = this.victoryExpressions[h.random(this.victoryExpressions.length - 1)]
-    
-    var victorySpeech = new SpeechSynthesisUtterance(victoryExpression(this.name));
-    this.speak(victorySpeech)
-
-  }
-
-  speak(msg: SpeechSynthesisUtterance){
-    window.speechSynthesis.speak(msg);
   }
 
   getClosestFighterInfrontOfYou(): Fighter{
@@ -326,9 +332,8 @@ export class Fighter {
   }
 
   chanceToLookBehind(): boolean{
-    return h.random(3) == 0
+    return random(3) == 0
   }
-
 
   action() {
     if(!this.majorActionInProgress){
@@ -402,12 +407,14 @@ export class Fighter {
       this.noActionFor7Seconds = true
     }, 7000)
   }
+
   resetNoActionTimer(){
     this.noActionTimerActive = false
     this.noActionFor7Seconds = false
     clearTimeout(this.noActionTimer)
   }
 
+  //////////////////////////////////////////
   
   getProbabilityToAttack(fighter: Fighter): number {
     let probability = 1
@@ -470,10 +477,10 @@ export class Fighter {
 
     const totalProbability = probailityToAttack + probailityToDefend + probailityToRetreat
 
-    const random = h.random(totalProbability)
+    const randomNum = random(totalProbability)
     let probabilityRange: number = 0
 
-    if (random >= probabilityRange && random < probailityToAttack + probabilityRange) {
+    if (randomNum >= probabilityRange && randomNum < probailityToAttack + probabilityRange) {
       this.fighterTargetedForAttack = fighter
       this.attackFighter()
     } else {
@@ -481,20 +488,18 @@ export class Fighter {
     }
     probabilityRange += probailityToAttack
 
-    if (random >= probabilityRange && random < probailityToDefend + probabilityRange) {
+    if (randomNum >= probabilityRange && randomNum < probailityToDefend + probabilityRange) {
       this.defend()
     }
     probabilityRange += probailityToDefend
 
-    if (random >= probabilityRange && random < probailityToRetreat + probabilityRange) {
+    if (randomNum >= probabilityRange && randomNum < probailityToRetreat + probabilityRange) {
       this.retreatingFromFighter = fighter      
       this.retreatFromFighter()
     } else {      
       this.retreatingFromFighter = undefined    
     }
-  }
-
-  
+  }  
 
   attackFighter() {
     const fighterProximity: Proximity = this.getFighterProximity(this.fighterTargetedForAttack)
@@ -513,7 +518,7 @@ export class Fighter {
 
   defend() {
     this.startMinorAction(1, 'defending')
-    this.updateModelState(FighterModelStates['blocking'])
+    this.updateModel('defending')
   }
 
   retreatFromFighter() {
@@ -525,8 +530,8 @@ export class Fighter {
   }
 
   wanderAround() {
-    this.movingDirection = <Direction360>h.random(360)
-    const randomDuration = h.random(4, true)    
+    this.movingDirection = <Direction360>random(360)
+    const randomDuration = random(4, true)    
     
     if(!this.moving && !this.minorActionInProgress){
       this.move(randomDuration)
@@ -537,22 +542,21 @@ export class Fighter {
     if(this.knockedOut){
       debugger
     }
-    this.updateModelState(FighterModelStates['recovering'])
+    this.updateModel('recovering')
     this.startMinorAction(2, 'recovering')
     .then(() => {
       this.stamina++
     })
   }
 
-
+  //////////////////////////////////////////
 
   cancelMinorAction(){
     this.minorActionInProgress = null
     this.minorActionReject()    
     if(this.moving)
       this.cancelMove()
-  }
-  
+  }  
 
   cancelMajorAction(){
     this.majorActionInProgress = null
@@ -561,7 +565,6 @@ export class Fighter {
       this.cancelMinorAction()
     }
   }
-
 
   startMinorAction(duration: number, actionName: MinorActions): Promise<any>{
     this.minorActionInProgress = actionName
@@ -575,7 +578,6 @@ export class Fighter {
 
     }).catch(()=>{})     
   }
-
   
   startMajorAction(duration: number, actionName: MajorActions): Promise<any>{
     if(this.majorActionInProgress){
@@ -597,10 +599,12 @@ export class Fighter {
 
   majorActionCoolDown(duration: number){
     if(!this.majorActionInProgress && !this.knockedOut){
-      this.updateModelState(FighterModelStates['idle'])
+      this.updateModel('active')
       this.startMajorAction(duration, 'cooldown')
     }
   }
+
+  //////////////////////////////////////////
 
   getFighterDistanceAway(fighter: Fighter): number{
     let distance
@@ -668,7 +672,6 @@ export class Fighter {
     }
   }
 
-
   getDirectionOfFighter(fighter: Fighter, opposite?: boolean): Direction360 {
 
   
@@ -727,8 +730,6 @@ export class Fighter {
     return otherFigherDirectionFromFighter
   }
 
-
-
   getNumberFightersInfront(proximity: Proximity): number {
     let nearbyFightersInfront: number = 0
     if (this.facingDirection == 'left') {
@@ -755,51 +756,6 @@ export class Fighter {
 
   }
 
-
-  tryToDodge(fighterAttack: FighterAttack): boolean {
-
-    const randomNumber: number = h.random(10)
-
-    const speedDifference: number = this.speed - fighterAttack.speed
-    if (speedDifference == 2) {
-      return randomNumber < 6
-    }
-    if (speedDifference == 1) {
-      return randomNumber < 5
-    }
-    if (speedDifference == 0) {
-      return randomNumber < 4
-    }
-    if (speedDifference == -1) {
-      return randomNumber < 3
-    }
-    if (speedDifference == -2) {
-      return randomNumber < 2
-    }
-  }
-
-  tryToBlock(fighterAttack: FighterAttack): boolean {
-
-    const randomNumber: number = h.random(10)
-
-    const strengthDifference: number = this.strength - fighterAttack.strength
-    if (strengthDifference == 2) {
-      return randomNumber < 6
-    }
-    if (strengthDifference == 1) {
-      return randomNumber < 5
-    }
-    if (strengthDifference == 0) {
-      return randomNumber < 4
-    }
-    if (strengthDifference == -1) {
-      return randomNumber < 3
-    }
-    if (strengthDifference == -2) {
-      return randomNumber < 2
-    }
-  }
-
   isFacingFighter(fighter: Fighter): boolean {
     const directionOfFighter: Direction360 = this.getDirectionOfFighter(fighter)
     if(directionOfFighter < 180 && this.facingDirection == 'right'){
@@ -815,50 +771,198 @@ export class Fighter {
     this.modelUpdateSubj.next()
   }
 
+  //////////////////////////////////////////
 
   tryToHitFighter() {
     this.resetNoActionTimer()
-    const attack: FighterAttack = {
-      speed: this.speed,
-      strength: this.strength
+    const result: ResponseToFighterAttack = this.fighterTargetedForAttack.getAttacked(this)
+    if(result == 'take critical hit'){
+      this.startMajorAction(this.animationTimes.punch, 'critical striking')
+      .then(() => this.afterTryToHitFighter(result))
+      this.updateModel('critical striking')
+
+    } else {
+      this.startMajorAction(this.animationTimes.punch, 'punching')
+      .then(() => this.afterTryToHitFighter(result))
+      this.updateModel('punching')
     }
-    const result: AttackResults = this.fighterTargetedForAttack.getAttacked(this, attack)
-
-    this.startMajorAction(this.animationTimes.punch, 'punching')
-    .then(() => this.afterTryToHitFighter(result))
-    this.updateModelState(FighterModelStates['punching'])
-
   }
 
-  getAttacked(fighter: Fighter, fighterAttack: FighterAttack): AttackResults {    
+  getProbabilityToDodge(fighter: Fighter): number {
+
+    let probability: number = 2
+
+    probability += this.speed - fighter.speed
+    
+    if(this.stamina < fighter.stamina)
+      probability += fighter.stamina - this.stamina
+
+      
+    if(this.spirit > 2)
+     probability --
+
+    if(this.spirit < 2)
+      probability ++
+
+    if(this.minorActionInProgress == 'defending')
+      probability += 2
+
+    if(probability < 0)
+      probability = 0
+
+    return probability
+  }
+
+  getProbabilityToBlock(fighter: Fighter): number {
+
+    let probability: number = 2
+    
+    probability += this.strength - fighter.strength
+    
+    if(this.stamina > fighter.stamina)
+      probability += this.stamina - fighter.stamina
+      
+    if(this.speed < fighter.speed)
+      probability -= 1
+
+    if(this.spirit > 2)
+      probability ++
+
+    if(this.spirit < 2)
+      probability --    
+
+    if(this.pride > 2)
+      probability ++
+
+    if(this.pride < 2)
+      probability --    
+
+
+    if(this.minorActionInProgress == 'defending')
+      probability += 2
+
+      
+    if(probability < 0)
+      probability = 0
+
+    return probability
+  }
+
+  
+  getProbabilityToTakeHit(fighter: Fighter): number {
+
+    let probability: number = 5
+
+    if(fighter.speed > this.speed)
+      probability ++
+    
+    probability += fighter.spirit
+
+    probability -= fighter.aggression
+
+    if(probability < 0)
+      probability = 0
+
+    return probability
+  }
+
+
+  
+  getProbabilityToTakeCriticalHit(fighter: Fighter): number {
+
+    let probability: number = 0
+
+    if(fighter.speed > this.speed)
+      probability ++
+    
+    probability += fighter.spirit
+
+    probability += fighter.aggression
+    
+    if(probability < 0)
+      probability = 0
+
+    return probability
+  }
+
+
+  respondToFighterAttack(fighter: Fighter): ResponseToFighterAttack{
+    
+    const probailityToDodge: number = this.getProbabilityToDodge(fighter)
+    const probailityToBlock: number = this.getProbabilityToBlock(fighter)
+    const probailityToTakeHit: number = this.getProbabilityToTakeHit(fighter)
+    const probailityToTakeCriticalHit: number = this.getProbabilityToTakeCriticalHit(fighter)
+
+    const totalProbability = probailityToDodge + probailityToBlock + probailityToTakeHit + probailityToTakeCriticalHit
+
+    const randomNum = random(totalProbability)
+    let probabilityRange: number = 0
+
+    if (randomNum >= probabilityRange && randomNum < probailityToDodge + probabilityRange) {
+      return 'dodged'
+    }
+    probabilityRange += probailityToDodge
+
+    if (randomNum >= probabilityRange && randomNum < probailityToBlock + probabilityRange) {
+      return 'blocked'
+    }
+    probabilityRange += probailityToBlock
+
+    if (randomNum >= probabilityRange && randomNum < probailityToTakeHit + probabilityRange) {
+      return'take hit'
+    }    
+    probabilityRange += probailityToTakeHit
+
+    if (randomNum >= probabilityRange && randomNum < probailityToTakeCriticalHit + probabilityRange) {
+      return 'take critical hit'
+    }
+  }
+
+  takeUnprparedAttack(fighter: Fighter): ResponseToFighterAttack {
+    
+    const probailityToTakeHit: number = this.getProbabilityToTakeHit(fighter)
+    const probailityToTakeCriticalHit: number = this.getProbabilityToTakeCriticalHit(fighter)
+
+    const totalProbability = probailityToTakeHit + probailityToTakeCriticalHit
+
+    const randomNum = random(totalProbability)
+    let probabilityRange: number = 0
+
+    
+    if (randomNum >= probabilityRange && randomNum < probailityToTakeHit + probabilityRange) {
+      return'take hit'
+    }    
+    probabilityRange += probailityToTakeHit
+
+    if (randomNum >= probabilityRange && randomNum < probailityToTakeCriticalHit + probabilityRange) {
+      return 'take critical hit'
+    }
+  }
+
+  getAttacked(fighter: Fighter): ResponseToFighterAttack {    
     this.resetNoActionTimer()
     if (this.isFacingFighter(fighter) && !this.majorActionInProgress) {
-      if (this.tryToDodge(fighterAttack)) {
-        this.dodgeFighterAttack(fighter)
-        return AttackResults['dodged']
-      } 
-      else if (this.tryToBlock(fighterAttack)) {
-        this.blockFighterAttack(fighter)
-        return AttackResults['blocked']
-      }
+      return this.respondToFighterAttack(fighter)
     }
-    const hit: Hit = { damage: 1 }
-    this.takeAHit(hit, fighter)
-    return AttackResults['hit']
+    else{
+      return this.takeUnprparedAttack(fighter)
+    }
   }
 
   blockFighterAttack(fighter: Fighter){
     console.log(`${this.name} blocked ${fighter.name}'s attack`);
     this.startMajorAction(this.animationTimes.block, 'blocking')
     .then(() => this.afterBlock())
-    this.updateModelState(FighterModelStates['blocking'])
+
+    this.updateModel('blocking')
   }
 
   dodgeFighterAttack(fighter: Fighter){
     console.log(`${this.name} dodged ${fighter.name}'s attack`);
     this.startMajorAction(this.animationTimes.dodge, 'dodging')
     .then(() => this.afterDodge())
-    this.updateModelState(FighterModelStates['dodging'])    
+
+    this.updateModel('dodging')    
   }
 
   takeAHit(hit: Hit, fighter: Fighter){    
@@ -880,26 +984,30 @@ export class Fighter {
     this.startMajorAction(this.animationTimes.takeAHit, 'taking a hit')
     .then(() => {
       if(this.knockedOut){
-        this.updateModelState(FighterModelStates['down and out'])
+        this.updateModel('knocked out')
       } else {
         this.majorActionCoolDown(this.cooldowns.takeAHit)
       }
     })
     
-    this.updateModelState(FighterModelStates['taking a hit'])  
+    this.updateModel('taking a hit')  
   }
   
 
 
-  afterTryToHitFighter(result: AttackResults) {
+  afterTryToHitFighter(result: ResponseToFighterAttack) {
     
     if(!this.majorActionInProgress){
-      if (result == AttackResults['critical']) {
-        this.stamina = this.stamina + 1
+      if (result == 'take critical hit') {
+        this.goOnARampage()
       }
 
       this.majorActionCoolDown(this.cooldowns.punch)
     }
+  }
+
+  goOnARampage(){
+    this.stamina ++
   }
 
   afterDodge() {    
@@ -912,8 +1020,8 @@ export class Fighter {
 
 
 
-  updateModelState(state: FighterModelStates) {
-    if(this.modelState == FighterModelStates['down and out'] && state != FighterModelStates['down and out']){
+  updateModel(state: MajorActions | MinorActions | FighterStates) {
+    if(this.modelState == 'knocked out'){
       debugger
     }
     this.modelState = state
@@ -930,7 +1038,8 @@ export class Fighter {
         this.updateFacingDirection('left')
     }
   }
-
+  
+  //////////////////////////////////////////
 
   cancelMove(){
     this.moving = false
@@ -943,7 +1052,7 @@ export class Fighter {
 
   move(duration: number) {
     this.moving = true
-    this.updateModelState(FighterModelStates['walking'])
+    this.updateModel('walking')
     this.moveInterval = setInterval(() => {      
       
       if(this.knockedOut){
@@ -988,10 +1097,10 @@ export class Fighter {
 
   moveAwayFromWall(){
     if( this.movingDirection < 180){
-      this.movingDirection = <Direction360>(this.movingDirection + (h.random(90) + 90))
+      this.movingDirection = <Direction360>(this.movingDirection + (random(90) + 90))
     }
     if( this.movingDirection > 180){
-      this.movingDirection =  <Direction360>(this.movingDirection - (h.random(90) + 90))
+      this.movingDirection =  <Direction360>(this.movingDirection - (random(90) + 90))
     }
   }
 

@@ -1,7 +1,6 @@
 import { Component, Prop } from '@stencil/core';
 import { Fighter } from '../../../classes/fighter/fighter';
 import { FighterModelImage } from '../../../models/fighterModelImage';
-import { FighterModelStates } from '../../../enums/fighterModelStates';
 
 
 @Component({
@@ -20,7 +19,7 @@ export class FighterModel {
 		const movement = {
 			left: `${x}px`,
 			bottom: `${y}px`,
-			zIndex: `${this.fighter.modelState == FighterModelStates['down and out'] ? '0' : 1000-y}`
+			zIndex: `${this.fighter.modelState == 'knocked out' ? '0' : 1000-y}`
 		}
 		
 

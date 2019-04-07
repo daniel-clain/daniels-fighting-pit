@@ -1,8 +1,10 @@
 import { Dimensions } from "./dimensions";
-import { FighterModelStates } from '../enums/fighterModelStates';
+import { MajorActions } from "../types/majorActions";
+import { MinorActions } from "../types/minorActions";
+import { FighterStates } from "../types/fighterStates";
 
 export class FighterModelImage{
-	modelState: FighterModelStates
+	modelState: MajorActions | MinorActions | FighterStates
 	dimensions: Dimensions
 	imageName: string
 }
