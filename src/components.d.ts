@@ -76,22 +76,14 @@ export namespace Components {
     'playerState'?: PlayerStates;
   }
 
-  interface FightDayTest {
-    'fighters': Fighter[];
-  }
-  interface FightDayTestAttributes extends StencilHTMLAttributes {
-    'fighters'?: Fighter[];
-  }
+  interface FightDayTest {}
+  interface FightDayTestAttributes extends StencilHTMLAttributes {}
 
   interface FighterModel {
     'fighter': Fighter;
-    'scale': number;
-    'update': number;
   }
   interface FighterModelAttributes extends StencilHTMLAttributes {
     'fighter'?: Fighter;
-    'scale'?: number;
-    'update'?: number;
   }
 }
 

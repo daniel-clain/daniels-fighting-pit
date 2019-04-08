@@ -3,8 +3,6 @@ import { ConnectionStates } from '../../enums/connectionStates';
 import { WebsocketManager } from './websocketManager/websocketManager';
 import { PlayerStates } from '../../enums/playerStates';
 import { Game } from '../../classes/game/game';
-import { Fighter } from '../../classes/fighter/fighter';
-import { random } from './../../helper-functions/helper-functions'
 
 @Component({
   tag: 'daniels-fighting-pit',
@@ -17,20 +15,6 @@ export class DanielsFightingPit {
   websocketManager: WebsocketManager;
   groupId: string;
   game: Game;
-  
-	fighters: Fighter[] = [
-    new Fighter('Daniel', {x: random(500), y: random(300) + 100}, 3, 3, 3, 3, 3),
-    new Fighter('Tomasz', {x: random(500), y: random(300) + 100}, 3, 3, 3, 3, 3),
-    new Fighter('Hassan', {x: random(500), y: random(300) + 100}, 3, 3, 3, 3, 3), 
-    new Fighter('Dardan', {x: random(500), y: random(300) + 100}, 3, 3, 3, 3, 3),
-    new Fighter('Alex', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1),
-    new Fighter('Angelo', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1),
-    new Fighter('Paul', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1),
-    new Fighter('Suluman', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1),
-    new Fighter('Mark', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1),
-    new Fighter('Mat', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1),
-    new Fighter('Mike', {x: random(500), y: random(300) + 100}, 1, 1, 1, 1, 1)/* */
-  ]
   
   
   @Listen('queForGame')
@@ -74,7 +58,7 @@ export class DanielsFightingPit {
     const {playerState} = this;
     return (
       <main>
-        <fight-day-test fighters={this.fighters}></fight-day-test>
+        <fight-day-test></fight-day-test>
         { !'penisx' && <div>Connection State: {this.connectionState}</div>}
         {this.connectionState === ConnectionStates['connected'] && 
         <pre-game-lobby playerState={playerState} />}

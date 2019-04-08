@@ -1,1 +1,1 @@
-export function random(number: number, startAtOne?: boolean){return Math.round((Math.random() * (number + (startAtOne ? -1 : 0))) + (startAtOne ? 1 : 0))}
+export function random(number: number, startAtOne?: boolean){return Math.floor((Math.random() * (number + (startAtOne ? -1 : 0))) + (startAtOne ? 1 : 0))}

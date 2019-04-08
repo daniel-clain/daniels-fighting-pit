@@ -19,4 +19,15 @@
     overflow: visible;
 
   }
+  &__image {
+    position: absolute;
+    visibility: hidden;
+    &--is-showing{      
+      visibility: visible;
+    }
+    &--facing-left{      
+      transform: scalex(-1)
+
+    }
+  }
 }

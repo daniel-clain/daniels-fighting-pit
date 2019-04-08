@@ -1,1 +1,6 @@
-export type MinorActions = 'recovering' | 'defending' | 'walking'
+export type MinorActions = 
+'recovering' | 
+'defending' | 
+'wandering around' | 
+'retreating' | 
+'moving to attack'
