@@ -2,6 +2,7 @@ dist/
 !www/favicon.ico
 www/
 src/**/*.js
+lib/
 
 *~
 *.sw[mnpcod]

@@ -9,7 +9,9 @@
     "test": "stencil test --spec",
     "test.watch": "stencil test --spec --watchAll",
     "server.compile": "tsc -w src/server/server.ts",
+    "test-server.compile": "tsc -w src/server/test-server.ts",
     "serve": "node src/server/server.js",
+    "test-serve": "node src/server/test-server.js",
     "test.jest": "jest"
   },
   "dependencies": {

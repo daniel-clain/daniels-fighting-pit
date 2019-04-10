@@ -8,11 +8,11 @@ import { Position } from '../../../models/position';
 
 
 @Component({
-	tag: 'fighter-model',
-	styleUrls: ['fighter-model.scss'],
+	tag: 'fighter-component',
+	styleUrls: ['fighter.scss'],
 	shadow: true
 })
-export class FighterModel {
+export class FighterComponent {
 	@Prop() fighter: Fighter
 	@State() modelState: FighterModelStates
 	@State() position: Position

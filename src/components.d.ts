@@ -9,75 +9,67 @@ import '@stencil/core';
 
 
 import {
-  Fighter,
-} from './classes/fighter/fighter';
+  Fight,
+} from './server/game/fight/fight';
 import {
-  Game,
-} from './classes/game/game';
+  Fighter,
+} from './server/game/fighter/fighter';
 import {
   RoundNews,
 } from './models/roundNews';
 import {
   ManagerOption,
 } from './models/managerOptions';
-import {
-  PlayerStates,
-} from './enums/playerStates';
 
 
 export namespace Components {
 
-  interface FighterComponent {}
-  interface FighterComponentAttributes extends StencilHTMLAttributes {}
-
-  interface DanielsFightingPit {}
-  interface DanielsFightingPitAttributes extends StencilHTMLAttributes {}
-
-  interface FightDayInterface {
-    'fighters': Fighter[];
+  interface FightComponent {
+    'fight': Fight;
   }
-  interface FightDayInterfaceAttributes extends StencilHTMLAttributes {
-    'fighters'?: Fighter[];
+  interface FightComponentAttributes extends StencilHTMLAttributes {
+    'fight'?: Fight;
   }
 
-  interface GameInterface {
-    'game': Game;
+  interface FighterComponent {
+    'fighter': Fighter;
   }
-  interface GameInterfaceAttributes extends StencilHTMLAttributes {
-    'game'?: Game;
+  interface FighterComponentAttributes extends StencilHTMLAttributes {
+    'fighter'?: Fighter;
   }
 
-  interface NewsHeadlinesInterface {
+  interface GameComponent {}
+  interface GameComponentAttributes extends StencilHTMLAttributes {}
+
+  interface SetNameComponent {}
+  interface SetNameComponentAttributes extends StencilHTMLAttributes {}
+
+  interface NewsComponent {
     'roundNews': RoundNews[];
   }
-  interface NewsHeadlinesInterfaceAttributes extends StencilHTMLAttributes {
+  interface NewsComponentAttributes extends StencilHTMLAttributes {
     'roundNews'?: RoundNews[];
   }
 
-  interface PreFightInterface {
+  interface NotConnectedComponent {}
+  interface NotConnectedComponentAttributes extends StencilHTMLAttributes {}
+
+  interface PreFightComponent {
     'fighters': Fighter[];
     'managersMoney': number;
     'managersOptions': ManagerOption[];
   }
-  interface PreFightInterfaceAttributes extends StencilHTMLAttributes {
+  interface PreFightComponentAttributes extends StencilHTMLAttributes {
     'fighters'?: Fighter[];
     'managersMoney'?: number;
     'managersOptions'?: ManagerOption[];
   }
 
-  interface PreGameLobby {
-    'playerState': PlayerStates;
-  }
-  interface PreGameLobbyAttributes extends StencilHTMLAttributes {
-    'onCancelQueForGame'?: (event: CustomEvent) => void;
-    'onGameAccepted'?: (event: CustomEvent) => void;
-    'onGameDeclined'?: (event: CustomEvent) => void;
-    'onQueForGame'?: (event: CustomEvent) => void;
-    'playerState'?: PlayerStates;
-  }
+  interface PreGameLobbyComponent {}
+  interface PreGameLobbyComponentAttributes extends StencilHTMLAttributes {}
 
-  interface FightDayTest {}
-  interface FightDayTestAttributes extends StencilHTMLAttributes {}
+  interface DanielsFightingPit {}
+  interface DanielsFightingPitAttributes extends StencilHTMLAttributes {}
 
   interface FighterModel {
     'fighter': Fighter;
@@ -89,29 +81,37 @@ export namespace Components {
 
 declare global {
   interface StencilElementInterfaces {
+    'FightComponent': Components.FightComponent;
     'FighterComponent': Components.FighterComponent;
+    'GameComponent': Components.GameComponent;
+    'SetNameComponent': Components.SetNameComponent;
+    'NewsComponent': Components.NewsComponent;
+    'NotConnectedComponent': Components.NotConnectedComponent;
+    'PreFightComponent': Components.PreFightComponent;
+    'PreGameLobbyComponent': Components.PreGameLobbyComponent;
     'DanielsFightingPit': Components.DanielsFightingPit;
-    'FightDayInterface': Components.FightDayInterface;
-    'GameInterface': Components.GameInterface;
-    'NewsHeadlinesInterface': Components.NewsHeadlinesInterface;
-    'PreFightInterface': Components.PreFightInterface;
-    'PreGameLobby': Components.PreGameLobby;
-    'FightDayTest': Components.FightDayTest;
     'FighterModel': Components.FighterModel;
   }
 
   interface StencilIntrinsicElements {
+    'fight-component': Components.FightComponentAttributes;
     'fighter-component': Components.FighterComponentAttributes;
+    'game-component': Components.GameComponentAttributes;
+    'set-name-component': Components.SetNameComponentAttributes;
+    'news-component': Components.NewsComponentAttributes;
+    'not-connected-component': Components.NotConnectedComponentAttributes;
+    'pre-fight-component': Components.PreFightComponentAttributes;
+    'pre-game-lobby-component': Components.PreGameLobbyComponentAttributes;
     'daniels-fighting-pit': Components.DanielsFightingPitAttributes;
-    'fight-day-interface': Components.FightDayInterfaceAttributes;
-    'game-interface': Components.GameInterfaceAttributes;
-    'news-headlines-interface': Components.NewsHeadlinesInterfaceAttributes;
-    'pre-fight-interface': Components.PreFightInterfaceAttributes;
-    'pre-game-lobby': Components.PreGameLobbyAttributes;
-    'fight-day-test': Components.FightDayTestAttributes;
     'fighter-model': Components.FighterModelAttributes;
   }
 
+
+  interface HTMLFightComponentElement extends Components.FightComponent, HTMLStencilElement {}
+  var HTMLFightComponentElement: {
+    prototype: HTMLFightComponentElement;
+    new (): HTMLFightComponentElement;
+  };
 
   interface HTMLFighterComponentElement extends Components.FighterComponent, HTMLStencilElement {}
   var HTMLFighterComponentElement: {
@@ -119,46 +119,46 @@ declare global {
     new (): HTMLFighterComponentElement;
   };
 
+  interface HTMLGameComponentElement extends Components.GameComponent, HTMLStencilElement {}
+  var HTMLGameComponentElement: {
+    prototype: HTMLGameComponentElement;
+    new (): HTMLGameComponentElement;
+  };
+
+  interface HTMLSetNameComponentElement extends Components.SetNameComponent, HTMLStencilElement {}
+  var HTMLSetNameComponentElement: {
+    prototype: HTMLSetNameComponentElement;
+    new (): HTMLSetNameComponentElement;
+  };
+
+  interface HTMLNewsComponentElement extends Components.NewsComponent, HTMLStencilElement {}
+  var HTMLNewsComponentElement: {
+    prototype: HTMLNewsComponentElement;
+    new (): HTMLNewsComponentElement;
+  };
+
+  interface HTMLNotConnectedComponentElement extends Components.NotConnectedComponent, HTMLStencilElement {}
+  var HTMLNotConnectedComponentElement: {
+    prototype: HTMLNotConnectedComponentElement;
+    new (): HTMLNotConnectedComponentElement;
+  };
+
+  interface HTMLPreFightComponentElement extends Components.PreFightComponent, HTMLStencilElement {}
+  var HTMLPreFightComponentElement: {
+    prototype: HTMLPreFightComponentElement;
+    new (): HTMLPreFightComponentElement;
+  };
+
+  interface HTMLPreGameLobbyComponentElement extends Components.PreGameLobbyComponent, HTMLStencilElement {}
+  var HTMLPreGameLobbyComponentElement: {
+    prototype: HTMLPreGameLobbyComponentElement;
+    new (): HTMLPreGameLobbyComponentElement;
+  };
+
   interface HTMLDanielsFightingPitElement extends Components.DanielsFightingPit, HTMLStencilElement {}
   var HTMLDanielsFightingPitElement: {
     prototype: HTMLDanielsFightingPitElement;
     new (): HTMLDanielsFightingPitElement;
-  };
-
-  interface HTMLFightDayInterfaceElement extends Components.FightDayInterface, HTMLStencilElement {}
-  var HTMLFightDayInterfaceElement: {
-    prototype: HTMLFightDayInterfaceElement;
-    new (): HTMLFightDayInterfaceElement;
-  };
-
-  interface HTMLGameInterfaceElement extends Components.GameInterface, HTMLStencilElement {}
-  var HTMLGameInterfaceElement: {
-    prototype: HTMLGameInterfaceElement;
-    new (): HTMLGameInterfaceElement;
-  };
-
-  interface HTMLNewsHeadlinesInterfaceElement extends Components.NewsHeadlinesInterface, HTMLStencilElement {}
-  var HTMLNewsHeadlinesInterfaceElement: {
-    prototype: HTMLNewsHeadlinesInterfaceElement;
-    new (): HTMLNewsHeadlinesInterfaceElement;
-  };
-
-  interface HTMLPreFightInterfaceElement extends Components.PreFightInterface, HTMLStencilElement {}
-  var HTMLPreFightInterfaceElement: {
-    prototype: HTMLPreFightInterfaceElement;
-    new (): HTMLPreFightInterfaceElement;
-  };
-
-  interface HTMLPreGameLobbyElement extends Components.PreGameLobby, HTMLStencilElement {}
-  var HTMLPreGameLobbyElement: {
-    prototype: HTMLPreGameLobbyElement;
-    new (): HTMLPreGameLobbyElement;
-  };
-
-  interface HTMLFightDayTestElement extends Components.FightDayTest, HTMLStencilElement {}
-  var HTMLFightDayTestElement: {
-    prototype: HTMLFightDayTestElement;
-    new (): HTMLFightDayTestElement;
   };
 
   interface HTMLFighterModelElement extends Components.FighterModel, HTMLStencilElement {}
@@ -168,26 +168,28 @@ declare global {
   };
 
   interface HTMLElementTagNameMap {
+    'fight-component': HTMLFightComponentElement
     'fighter-component': HTMLFighterComponentElement
+    'game-component': HTMLGameComponentElement
+    'set-name-component': HTMLSetNameComponentElement
+    'news-component': HTMLNewsComponentElement
+    'not-connected-component': HTMLNotConnectedComponentElement
+    'pre-fight-component': HTMLPreFightComponentElement
+    'pre-game-lobby-component': HTMLPreGameLobbyComponentElement
     'daniels-fighting-pit': HTMLDanielsFightingPitElement
-    'fight-day-interface': HTMLFightDayInterfaceElement
-    'game-interface': HTMLGameInterfaceElement
-    'news-headlines-interface': HTMLNewsHeadlinesInterfaceElement
-    'pre-fight-interface': HTMLPreFightInterfaceElement
-    'pre-game-lobby': HTMLPreGameLobbyElement
-    'fight-day-test': HTMLFightDayTestElement
     'fighter-model': HTMLFighterModelElement
   }
 
   interface ElementTagNameMap {
+    'fight-component': HTMLFightComponentElement;
     'fighter-component': HTMLFighterComponentElement;
+    'game-component': HTMLGameComponentElement;
+    'set-name-component': HTMLSetNameComponentElement;
+    'news-component': HTMLNewsComponentElement;
+    'not-connected-component': HTMLNotConnectedComponentElement;
+    'pre-fight-component': HTMLPreFightComponentElement;
+    'pre-game-lobby-component': HTMLPreGameLobbyComponentElement;
     'daniels-fighting-pit': HTMLDanielsFightingPitElement;
-    'fight-day-interface': HTMLFightDayInterfaceElement;
-    'game-interface': HTMLGameInterfaceElement;
-    'news-headlines-interface': HTMLNewsHeadlinesInterfaceElement;
-    'pre-fight-interface': HTMLPreFightInterfaceElement;
-    'pre-game-lobby': HTMLPreGameLobbyElement;
-    'fight-day-test': HTMLFightDayTestElement;
     'fighter-model': HTMLFighterModelElement;
   }
 

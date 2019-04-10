@@ -1,5 +1,5 @@
-import { Component, Listen, State } from '@stencil/core';
-import { Fighter } from '../../classes/fighter/fighter';
+/* import { Component, Listen, State } from '@stencil/core';
+import { Fighter } from '../../server/game/fighter/fighter';
 import { Dimensions } from '../../models/dimensions';
 import { Subject } from 'rxjs';
 import { ArenaInfo } from '../../models/arenaInfo';
@@ -23,7 +23,7 @@ export class FightDayTest {
     new Fighter('Angelo', {x: random(700), y: random(300) + 100}, 0, 2, 0, 1, 0),
     new Fighter('Paul', {x: random(700), y: random(300) + 100}, 0, 1, 0, 0, 0),
     new Fighter('Suleman', {x: random(700), y: random(300) + 100}, 0, 3, 0, 0, 0),
-    new Fighter('Mark', {x: random(700), y: random(300) + 100}, 1, 1, 0, 0, 0),/**/
+    new Fighter('Mark', {x: random(700), y: random(300) + 100}, 1, 1, 0, 0, 0),
     new Fighter('Mat', {x: random(700), y: random(300) + 100}, 1, 1, 0, 3, 0),
     new Fighter('Mike', {x: random(700), y: random(300) + 100}, 0, 3, 2, 0, 0) 
   ]
@@ -71,4 +71,4 @@ export class FightDayTest {
 	}
 
 
-}
+} */

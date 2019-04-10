@@ -1,0 +1,1 @@
+export type ConnectionStates = 'not connected' | 'trying to connect' | 'connected'
