@@ -37,6 +37,8 @@ export class WebsocketService{
       this.handleClientMessages()  
       this.server.on('connect_error', () => {
         this.server.destroy();
+        this.connectionStatusSubject.next('not connected')
+        throw 'connection error'
       });
 
       
@@ -51,7 +53,13 @@ export class WebsocketService{
       }
       this.sendMessageToServer(playerConnect)
 
-      this.awaitServerEvent('player connected').then(resolve)
+      this.awaitServerEvent('player connected').then(
+        clientId => {
+          if(clientId)
+            this.localStorageService.clientId = clientId
+          resolve()
+        }
+      )
 
     })
     .then(() => this.connectionStatusSubject.next('connected'))
@@ -80,8 +88,7 @@ export class WebsocketService{
   }
 
   awaitServerEvent(serverEventName: ServerToClientName): Promise<any>{
-    return new Promise(resolve => {      
-      console.log('doink');
+    return new Promise(resolve => {
       const subscription = this.serverToClientSubject.subscribe(
         (serverToClient: ServerToClient) => {
           if(serverToClient.name == serverEventName){
@@ -131,8 +138,9 @@ export class WebsocketService{
       this.queueingStatusSubject.next('not queueing')
       this.localStorageService.removeGameId()
     })
-    
-
+  }
+  disconnect(){
+    this.sendMessageToServer({name: 'disconnect'})
   }
 
 }

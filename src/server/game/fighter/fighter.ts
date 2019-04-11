@@ -3,7 +3,6 @@ import { Position } from "../../../models/position";
 import { Subject } from "rxjs";
 import { random } from "../../../helper-functions/helper-functions";
 import { Dimensions } from "../../../models/dimensions";
-import { Edges } from '../../../enums/edges';
 import { ArenaInfo } from '../../../models/arenaInfo';
 import { Proximity } from '../../../types/proximity';
 import { FacingDirection } from '../../../types/facingDirection';
@@ -14,8 +13,10 @@ import { MinorActions } from '../../../types/minorActions';
 import { ResponseToFighterAttack } from '../../../types/responseToFighterAttack';
 import { FighterStates } from "../../../types/fighterStates";
 import { HitDamage } from "../../../types/hitDamage";
-import { fighterModelImages } from "../fighterModelImages";
 import { FighterModelStates } from "../../../types/fighterModelStates";
+import { Edges } from "../../../types/edges";
+import { FighterModelImage } from "../../../models/fighterModelImage";
+
 export class Fighter {
   position: Position
 	facingDirection: FacingDirection
@@ -106,6 +107,59 @@ export class Fighter {
 
   //////////////////////////////  
 
+  fighterModelImages: FighterModelImage[] = [
+    {
+      modelState: 'active',
+      dimensions: { width: 58, height: 92 },
+      imageName: 'idle.png'
+    },
+    {
+      modelState: 'punching',
+      dimensions: { width: 63, height: 79 },
+      imageName: 'punch.png'
+    },
+    {
+      modelState: 'critical striking',
+      dimensions: { width: 87, height: 86 },
+      imageName: 'kick.png'
+    },
+    {
+      modelState: 'knocked out',
+      dimensions: { width: 80, height: 40 },
+      imageName: 'down-and-out.png'
+    },
+    {
+      modelState: 'dodging',
+      dimensions: { width: 49, height: 79 },
+      imageName: 'dodge.png'
+    },
+    {
+      modelState: 'blocking',
+      dimensions: { width: 53, height: 74 },
+      imageName: 'block.png'
+    },
+    {
+      modelState: 'defending',
+      dimensions: { width: 53, height: 74 },
+      imageName: 'block.png'
+    },
+    {
+      modelState: 'taking a hit',
+      dimensions: { width: 56, height: 83 },
+      imageName: 'take-hit.png'
+    },
+    {
+      modelState: 'walking',
+      dimensions: { width: 41, height: 93 },
+      imageName: 'walking.png'
+    },
+    {
+      modelState: 'recovering',
+      dimensions: { width: 45, height: 67 },
+      imageName: 'recover.png'
+    }
+  ]
+
 
   /* soundEffects = {
     punch: new Audio('./assets/sound-effects/punch.mp3'),
@@ -166,7 +220,7 @@ export class Fighter {
   }
 
   getModelEdgeVals(): ModelEdgeVals {
-    const modelDimensions: Dimensions = fighterModelImages.find(image => image.modelState == this.modelState).dimensions
+    const modelDimensions: Dimensions = this.fighterModelImages.find(image => image.modelState == this.modelState).dimensions
     if(!modelDimensions)
       debugger
     let modelEdgeVals: ModelEdgeVals = {
@@ -703,8 +757,8 @@ export class Fighter {
   }
 
   fighterWithinVerticleHitBox(fighter: Fighter, proximity: Proximity): boolean {
-    const thisModelHeight: number = fighterModelImages.find(image => image.modelState == this.modelState).dimensions.height
-    const otherModelHeight: number = fighterModelImages.find(image => image.modelState == this.modelState).dimensions.height
+    const thisModelHeight: number = this.fighterModelImages.find(image => image.modelState == this.modelState).dimensions.height
+    const otherModelHeight: number = this.fighterModelImages.find(image => image.modelState == this.modelState).dimensions.height
 
     const twentyPercentOfThisHeight = thisModelHeight * 0.2
     const twentyPercentOfOtherHeight = otherModelHeight * 0.2
@@ -1209,16 +1263,16 @@ export class Fighter {
   moveHitEdge(x, y): Edges {
     const edgeVals: ModelEdgeVals = this.getModelEdgeVals()
     if (edgeVals.right + x >= this.arenaDimensions.width) {
-      return Edges.right
+      return 'right'
     }
     if (edgeVals.left + x < 0) {
-      return Edges.left
+      return 'left'
     }
     if (edgeVals.top + y > this.arenaDimensions.height) {
-      return Edges.top
+      return 'top'
     }
     if (edgeVals.bottom + y < 0) {
-      return Edges.bottom
+      return 'bottom'
     }
   }
 

@@ -1,11 +1,7 @@
 import { Fighter } from "../fighter/fighter";
-import { FightStates } from "../../../enums/fightStates";
-import { Subject } from "rxjs";
 
 export class Fight {
   fighters: Fighter[]
-  fightState: FightStates = FightStates['beginning of fight'];
-  fightStateSubject: Subject<FightStates> = new Subject();
   winnerOfTheFight: Fighter
   constructor(fighters: Fighter[]) {
     this.fighters = fighters

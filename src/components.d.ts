@@ -15,11 +15,17 @@ import {
   Fighter,
 } from './server/game/fighter/fighter';
 import {
+  GameSkeleton,
+} from './models/game-skeleton';
+import {
   RoundNews,
 } from './models/roundNews';
 import {
-  ManagerOption,
-} from './models/managerOptions';
+  Manager,
+} from './server/game/manager/manager';
+import {
+  FighterSkeleton,
+} from './models/fighter-skeleton';
 
 
 export namespace Components {
@@ -38,8 +44,12 @@ export namespace Components {
     'fighter'?: Fighter;
   }
 
-  interface GameComponent {}
-  interface GameComponentAttributes extends StencilHTMLAttributes {}
+  interface GameComponent {
+    'game': GameSkeleton;
+  }
+  interface GameComponentAttributes extends StencilHTMLAttributes {
+    'game'?: GameSkeleton;
+  }
 
   interface SetNameComponent {}
   interface SetNameComponentAttributes extends StencilHTMLAttributes {}
@@ -54,15 +64,16 @@ export namespace Components {
   interface NotConnectedComponent {}
   interface NotConnectedComponentAttributes extends StencilHTMLAttributes {}
 
+  interface PostFightComponent {}
+  interface PostFightComponentAttributes extends StencilHTMLAttributes {}
+
   interface PreFightComponent {
-    'fighters': Fighter[];
-    'managersMoney': number;
-    'managersOptions': ManagerOption[];
+    'fighters': FighterSkeleton[];
+    'manager': Manager;
   }
   interface PreFightComponentAttributes extends StencilHTMLAttributes {
-    'fighters'?: Fighter[];
-    'managersMoney'?: number;
-    'managersOptions'?: ManagerOption[];
+    'fighters'?: FighterSkeleton[];
+    'manager'?: Manager;
   }
 
   interface PreGameLobbyComponent {}
@@ -87,6 +98,7 @@ declare global {
     'SetNameComponent': Components.SetNameComponent;
     'NewsComponent': Components.NewsComponent;
     'NotConnectedComponent': Components.NotConnectedComponent;
+    'PostFightComponent': Components.PostFightComponent;
     'PreFightComponent': Components.PreFightComponent;
     'PreGameLobbyComponent': Components.PreGameLobbyComponent;
     'DanielsFightingPit': Components.DanielsFightingPit;
@@ -100,6 +112,7 @@ declare global {
     'set-name-component': Components.SetNameComponentAttributes;
     'news-component': Components.NewsComponentAttributes;
     'not-connected-component': Components.NotConnectedComponentAttributes;
+    'post-fight-component': Components.PostFightComponentAttributes;
     'pre-fight-component': Components.PreFightComponentAttributes;
     'pre-game-lobby-component': Components.PreGameLobbyComponentAttributes;
     'daniels-fighting-pit': Components.DanielsFightingPitAttributes;
@@ -143,6 +156,12 @@ declare global {
     new (): HTMLNotConnectedComponentElement;
   };
 
+  interface HTMLPostFightComponentElement extends Components.PostFightComponent, HTMLStencilElement {}
+  var HTMLPostFightComponentElement: {
+    prototype: HTMLPostFightComponentElement;
+    new (): HTMLPostFightComponentElement;
+  };
+
   interface HTMLPreFightComponentElement extends Components.PreFightComponent, HTMLStencilElement {}
   var HTMLPreFightComponentElement: {
     prototype: HTMLPreFightComponentElement;
@@ -174,6 +193,7 @@ declare global {
     'set-name-component': HTMLSetNameComponentElement
     'news-component': HTMLNewsComponentElement
     'not-connected-component': HTMLNotConnectedComponentElement
+    'post-fight-component': HTMLPostFightComponentElement
     'pre-fight-component': HTMLPreFightComponentElement
     'pre-game-lobby-component': HTMLPreGameLobbyComponentElement
     'daniels-fighting-pit': HTMLDanielsFightingPitElement
@@ -187,6 +207,7 @@ declare global {
     'set-name-component': HTMLSetNameComponentElement;
     'news-component': HTMLNewsComponentElement;
     'not-connected-component': HTMLNotConnectedComponentElement;
+    'post-fight-component': HTMLPostFightComponentElement;
     'pre-fight-component': HTMLPreFightComponentElement;
     'pre-game-lobby-component': HTMLPreGameLobbyComponentElement;
     'daniels-fighting-pit': HTMLDanielsFightingPitElement;

@@ -1,7 +1,7 @@
-import { ConnectedPlayer } from "./connectedPlayer";
+import { Player } from "./player";
 
 export interface PlayerGroup{
   groupId: string
-  playersResponse: {player: ConnectedPlayer, accepted: boolean}[]
+  playersResponse: {player: Player, accepted: boolean}[]
   
 }

@@ -1,16 +1,16 @@
-import { ConnectedPlayer } from "../models/connectedPlayer";
+import { Player } from "../models/player";
 import { GameManager } from "./GameManager";
 import { PlayerGroup } from "../models/playerGroup";
 import { ClientToServer } from "../models/clientToServer";
 
 export class QueManager{
 
-  playersQueueingForAGame: ConnectedPlayer[] = []
+  playersQueueingForAGame: Player[] = []
   gameAvailableGroups: PlayerGroup[] = []
   
   constructor(private gameManager: GameManager){}
 
-  handleClientMessages(clientToServer: ClientToServer, player: ConnectedPlayer){    
+  handleClientMessages(clientToServer: ClientToServer, player: Player){    
     switch(clientToServer.name){
       case 'que for game' : this.queForGame(player); break
       case 'cancel que for game' : this.cancelQueForGame(player); break
@@ -19,7 +19,7 @@ export class QueManager{
     }
   }
 
-  queForGame(player: ConnectedPlayer){
+  queForGame(player: Player){
     this.playersQueueingForAGame.push(player)
     console.log(`${player.name} added to que`)
     player.sendToClient({name: 'added to que'})
@@ -31,9 +31,9 @@ export class QueManager{
 
   }
 
-  cancelQueForGame(player: ConnectedPlayer){
+  cancelQueForGame(player: Player){
     this.playersQueueingForAGame = this.playersQueueingForAGame.filter(
-      (p: ConnectedPlayer) => p.clientId != player.clientId)
+      (p: Player) => p.clientId != player.clientId)
     console.log(`${player.name} removed from que`)
     player.sendToClient({name: 'removed from que'})
   }
@@ -41,9 +41,9 @@ export class QueManager{
   mockOtherPlayersJoinIn3Seconds(){
     setTimeout(() => {
       this.playersQueueingForAGame.push(
-        {name: 'Fred', clientId: 'mock', sendToClient: () => console.log('emit to mock client')}, 
-        {name: 'Bob', clientId: 'mock', sendToClient: () => console.log('emit to mock client')}, 
-        {name: 'Jim', clientId: 'mock', sendToClient: () => console.log('emit to mock client')}, 
+        {connected: true, name: 'Fred', clientId: 'mock', sendToClient: () => console.log('emit to mock client')}, 
+        {connected: true, name: 'Bob', clientId: 'mock', sendToClient: () => console.log('emit to mock client')}, 
+        {connected: true, name: 'Jim', clientId: 'mock', sendToClient: () => console.log('emit to mock client')}, 
       )
       this.checkIfTheresEnoughPlayersForAGame()
     }, 2000)
@@ -55,7 +55,7 @@ export class QueManager{
       debugger
     }
     if(this.playersQueueingForAGame.length == 4){
-      const players: ConnectedPlayer[] = this.playersQueueingForAGame.splice(0, 4)
+      const players: Player[] = this.playersQueueingForAGame.splice(0, 4)
       const group: PlayerGroup = {
         groupId: new Date().getTime().toString(),
         playersResponse: players.map(player => ({
@@ -82,7 +82,7 @@ export class QueManager{
     this.gameAvailableGroups = this.gameAvailableGroups.filter(group => group.groupId != groupId)
   }
 
-  acceptGame(player: ConnectedPlayer, groupId){
+  acceptGame(player: Player, groupId){
     const group: PlayerGroup = this.gameAvailableGroups.find(group => group.groupId == groupId)    
     if(!group){
       console.log('Error: should be able to find group by id');
@@ -130,6 +130,23 @@ export class QueManager{
       this.gameManager.startNewGame(group.groupId, players)
       this.gameAvailableGroups = this.gameAvailableGroups.filter(g => g.groupId != group.groupId)
     }
+  }
+
+  playerDisconnected(clientId: string){
+    let index = this.playersQueueingForAGame.findIndex(player => player.clientId == clientId)
+    if(index >= 0)
+      this.playersQueueingForAGame.splice(index, 1)
+
+      
+    const group: PlayerGroup = this.gameAvailableGroups.find(
+      group => !!group.playersResponse.find(
+        response => response.player.clientId == clientId
+      )
+    )
+    if(group)
+      this.declineGame(group.groupId)
+
+    
   }
   
 }

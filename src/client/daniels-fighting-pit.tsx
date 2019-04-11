@@ -20,6 +20,7 @@ export class DanielsFightingPit {
     this.localStorageService = LocalStorageService.SingletonInstance
     this.establishSubscriptions()
     this.connectToGameServer()
+    window.onbeforeunload = () => this.websocketService.disconnect()
   }
 
   establishSubscriptions(){
@@ -46,18 +47,14 @@ export class DanielsFightingPit {
   
 
   render() {
-    return ([
-      <div>ConnectionStatus: {this.connectionStatus}</div>,
+    return (
       !this.name ? 
         <set-name-component></set-name-component> 
-      : 
-        this.connectionStatus != 'connected' ? 
+      : this.connectionStatus != 'connected' ? 
           <not-connected-component></not-connected-component>
-        : 
-          !this.gameActive ? 
+        : !this.gameActive ? 
             <pre-game-lobby-component></pre-game-lobby-component>
-          : 
-            <game-component></game-component>
-    ])
+          : <game-component game={this.gameActive}></game-component>
+    )
   }
 }

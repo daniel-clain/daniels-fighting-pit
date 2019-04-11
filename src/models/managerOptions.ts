@@ -1,5 +1,8 @@
-import { ManagerOptionNames } from "../enums/managerOptionNames";
+import { ManagerOptionNames } from "../types/managerOptionNames";
+
 
 export interface ManagerOption{
-    name: ManagerOptionNames
+    name: ManagerOptionNames,
+    cost: number,
+    effect: Function
 }

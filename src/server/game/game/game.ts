@@ -1,15 +1,25 @@
 import { Fighter } from "../fighter/fighter";
 import { Round } from "../round/round";
-import { ConnectedPlayer } from "../../../models/connectedPlayer";
+import { Player } from "../../../models/player";
 import { random } from "../../../helper-functions/helper-functions";
 import { GameSkeleton } from "../../../models/game-skeleton";
 import { PlayerSkeleton } from "../../../models/player-skeleton";
 import { RoundSkeleton } from "../../../models/round-skeleton";
 import { FighterSkeleton } from "../../../models/fighter-skeleton";
+import { Manager } from "../manager/manager";
+import { GameToClient } from "../../../types/gameToClient";
+import { Subject } from "rxjs";
 
 export class Game {
-	totalRounds: number;
-	currentRound: Round;
+	totalRounds: number
+  currentRound: Round
+  gameId: string
+  players: Player[]
+  gameTearDownTimer: NodeJS.Timeout
+  gameTearDownSubject: Subject<any> = new Subject()
+
+
+
 	fighters: Fighter[] = [
     new Fighter('Daniel', {x: random(700), y: random(300) + 100}, 3, 3, 3, 3, 0),
     new Fighter('Tomasz', {x: random(500), y: random(300) + 100}, 2, 2, 2, 1, 0),
@@ -24,23 +34,41 @@ export class Game {
     new Fighter('Mike', {x: random(700), y: random(300) + 100}, 0, 3, 2, 0, 0) 
   ]
 
-	constructor(private gameId: string, private players: ConnectedPlayer[]) {
+	constructor(gameId: string, players: Player[]) {
+    this.gameId = gameId
+    this.players = players
     console.log(this.gameId, this.players)
     this.startGame()
   }
   
   startGame(){
     this.currentRound = new Round(this.fighters.splice(0, 4), 1)
+    this.players.forEach((player: Player) => {
+      player.manager = new Manager()
+    })
 
     this.sendPlayersInitialGameSkeleton()    
+  }
+
+  pause(player: Player){
+    this.playersBroadcast('pause', player)
+    this.gameTearDownTimer = setTimeout(() => {
+      this.gameTearDownSubject.next()
+    }, 10000)
+  }
+
+  playersBroadcast(gameToClient: GameToClient, data: any){
+    this.players.forEach(player => 
+      player.sendToClient({name: gameToClient, data: data}))
   }
 
   sendPlayersInitialGameSkeleton(){
     
     const gameSkeleton: GameSkeleton = {
-      players: this.players.map((p: ConnectedPlayer): PlayerSkeleton => {
+      players: this.players.map((p: Player): PlayerSkeleton => {
         const player: PlayerSkeleton = {
-          name: p.name, playerId: p.clientId, money: 500, retired: false, sponsoredFighters: []
+          connected: p.connected,
+          name: p.name
         }
         return player
       }),
@@ -58,7 +86,10 @@ export class Game {
         stage: this.currentRound.stage
       } as RoundSkeleton
     }
-    this.players.forEach(player => player.sendToClient({name:'game started', data: gameSkeleton}))
+    this.players.forEach((player: Player) => {
+      gameSkeleton.manager = player.manager
+      player.sendToClient({name:'game started', data: gameSkeleton})
+    })
 
 
   }
