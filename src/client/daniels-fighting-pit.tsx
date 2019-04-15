@@ -1,8 +1,10 @@
 import { Component, State } from '@stencil/core';
 import { WebsocketService } from './websocket.service';
-import { ConnectionStates } from '../types/connectionStates';
+import { ConnectionStates } from '../types/app/connectionStates';
 import { LocalStorageService } from './local-storage.service';
-import { GameSkeleton } from '../models/game-skeleton';
+import { ServerToClient } from '../models/app/serverToClient';
+import { GameSkeleton } from '../models/game/game-skeleton';
+
 @Component({
   tag: 'daniels-fighting-pit',
   styleUrl: 'daniels-fighting-pit.scss',
@@ -11,7 +13,7 @@ import { GameSkeleton } from '../models/game-skeleton';
 export class DanielsFightingPit {
   @State() private name: string
   @State() private connectionStatus: ConnectionStates
-  @State() private gameActive: GameSkeleton
+  @State() private gameActive: boolean
   private websocketService: WebsocketService
   private localStorageService: LocalStorageService
 
@@ -27,9 +29,18 @@ export class DanielsFightingPit {
     this.websocketService.connectionStatusSubject.subscribe(
       (connectionStatus: ConnectionStates) => this.connectionStatus = connectionStatus
     )
-    this.websocketService.activeGameSubject.subscribe(
-      (gameActive: GameSkeleton) => this.gameActive = gameActive
-    )
+    this.websocketService.serverToClientSubject.subscribe((serverToClient: ServerToClient) => {
+
+      if(serverToClient.name == 'game started'){
+        this.gameActive = true
+        this.localStorageService.gameId = serverToClient.data
+      }
+        
+        
+      if(serverToClient.name == 'game ended')
+        this.gameActive = false
+    })
+    
     this.localStorageService.nameSubject.subscribe(
       (name: string) => {
         this.name = name
@@ -54,7 +65,7 @@ export class DanielsFightingPit {
           <not-connected-component></not-connected-component>
         : !this.gameActive ? 
             <pre-game-lobby-component></pre-game-lobby-component>
-          : <game-component game={this.gameActive}></game-component>
+          : <game-component></game-component>
     )
   }
 }

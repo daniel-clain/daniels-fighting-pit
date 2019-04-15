@@ -1,1 +1,0 @@
-export type RoundStages = 'pre-fight' | 'news' | 'fight in progress' | 'post-fight'

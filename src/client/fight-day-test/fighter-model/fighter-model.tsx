@@ -1,10 +1,7 @@
-import { Component, Prop, State } from '@stencil/core';
-import { FighterModelImage } from '../../../models/fighterModelImage';
-import { FacingDirection } from '../../../types/facingDirection';
-
-import { FighterModelStates } from '../../../types/fighterModelStates';
-import { Fighter } from '../../../server/game/fighter/fighter';
-import { Position } from '../../../models/position';
+import { Component, Prop, State } from "@stencil/core";
+import { Fighter } from "../../../server/game/fighter/fighter";
+import { FighterModelImage } from "../../../models/fighter/fighterModelImage";
+import { FighterSkeleton } from "../../../models/fighter/fighter-skeleton";
 
 
 @Component({
@@ -14,9 +11,7 @@ import { Position } from '../../../models/position';
 })
 export class FighterModel {
 	@Prop() fighter: Fighter
-	@State() modelState: FighterModelStates
-	@State() position: Position
-	@State() facingDirection: FacingDirection
+	@State() fighterSkeleton: FighterSkeleton
 
 	
 
@@ -88,19 +83,9 @@ fighterModelImages: FighterModelImage[] = [
 
 	componentWillLoad(){
 
-		this.fighter.positionUpdateSubject.subscribe(
-			(position: Position) => this.position = {...position})
-
-		this.fighter.modelStateUpdateSubject.subscribe(
-			(modelState: FighterModelStates) => this.modelState = modelState)
-
-		this.fighter.facingDirectionUpdateSubject.subscribe(
-			(facingDirection: FacingDirection) => this.facingDirection = facingDirection)
+		this.fighter.updateSubject.subscribe(
+			() => this.fighterSkeleton = this.fighter.getFighterSkeleton())
 			
-		this.position = this.fighter.position
-		this.modelState = this.fighter.modelState
-		this.facingDirection = this.fighter.facingDirection
-
 		this.fighterModelImages.forEach((image: FighterModelImage) => {
 			const {width, height} = image.dimensions
 			const fighterImageStyle = {
@@ -125,9 +110,9 @@ fighterModelImages: FighterModelImage[] = [
 	
 	render() {
 		const movement = {
-			left: `${this.position.x}px`,
-			bottom: `${this.position.y}px`,
-			zIndex: `${this.modelState == 'knocked out' ? '0' : 1000-this.position.y}`
+			left: `${this.fighterSkeleton.position.x}px`,
+			bottom: `${this.fighterSkeleton.position.y}px`,
+			zIndex: `${this.fighterSkeleton.modelState == 'knocked out' ? '0' : 1000-this.fighterSkeleton.position.y}`
 		}
 		
 		return (
@@ -135,43 +120,43 @@ fighterModelImages: FighterModelImage[] = [
 	<div class="fighter" style={movement}>
 		<div class="fighter-name">{this.fighter.name}</div>
 		<div class={`fighter__image 
-		${this.modelState == 'punching' ? 'fighter__image--is-showing' : ''}
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'punching' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
 		`} style={this.punchingStyle} ></div>
 		<div class={`fighter__image 
-		${this.modelState == 'knocked out' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.modelState == 'knocked out' ? 'fighter__image--is-showing' : ''}
 		`} style={this.knockedOutStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'dodging' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'dodging' ? 'fighter__image--is-showing' : ''}
 		`} style={this.dodgingStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'defending' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'defending' ? 'fighter__image--is-showing' : ''}
 		`} style={this.defendingStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'critical striking' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'critical striking' ? 'fighter__image--is-showing' : ''}
 		`} style={this.criticalStrikingStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'blocking' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'blocking' ? 'fighter__image--is-showing' : ''}
 		`} style={this.blockingStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'active' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'active' ? 'fighter__image--is-showing' : ''}
 		`} style={this.activeStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'recovering' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'recovering' ? 'fighter__image--is-showing' : ''}
 		`} style={this.recoveringStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'taking a hit' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'taking a hit' ? 'fighter__image--is-showing' : ''}
 		`} style={this.takingAHitStyle} ></div>
 		<div class={`fighter__image 
-		${this.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
-		${this.modelState == 'walking' ? 'fighter__image--is-showing' : ''}
+		${this.fighterSkeleton.facingDirection == 'left' ? 'fighter__image--facing-left' : ''}
+		${this.fighterSkeleton.modelState == 'walking' ? 'fighter__image--is-showing' : ''}
 		`} style={this.walkingStyle} ></div>
 	</div>
 		)

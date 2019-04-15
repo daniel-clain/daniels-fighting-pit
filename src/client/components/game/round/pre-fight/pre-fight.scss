@@ -1,0 +1,143 @@
+
+
+#pre-fight{
+  position: relative;  
+  height: 100%;
+  
+  &__background{
+    background-image: url('./../../assets/pre-fight-bg.jpg');
+    background-size: auto 100%;
+    height: 100%;
+    background-position-x: center;
+    filter: saturate(20%) grayscale(20%) blur(0.1rem);
+    position: absolute;
+    width: 100%;
+  }
+
+  
+  .train-fighter-popup{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.8);
+    display: none;
+    z-index: 2;
+  
+    &--showing{
+      display: block;
+    }
+
+    &__fighters-pane{
+      width: 26.5rem;
+      display: block;
+      margin: auto;
+      padding-top: 4rem;
+      button{
+        width: 6rem;
+        margin: 0.5rem;
+      }
+    }
+
+  }
+
+  #managers-money, #action-points{
+    top: .5rem;
+    position: absolute;
+    z-index: 1;
+    font-family: 'Permanent Marker'
+  }
+
+  #action-points{
+    right: .5rem;
+  }
+  #managers-money{
+    left: .5rem;
+  }
+
+  &__time-remaining{
+    position: relative;
+    text-align: center;
+    text-shadow: -1px 1px 2px #000;
+    text-shadow: -1px 1px 2px #000;
+    font-size: 2rem;
+    &__im-ready{
+      line-height: 2rem;
+      .my-checkbox{
+        height: 1.6rem;
+        width: 1.6rem;
+        margin: 0 0 0 1rem;
+        vertical-align: bottom;
+        border: 1px solid black;
+        display: inline-block;
+        border-radius: .2rem;
+        background: rgba(50,50,50,0.5);
+        &::after{
+          visibility: hidden;
+          content: '\2713';
+          position: relative;
+          top: -.8rem;
+          font-size: 2.4rem;
+          color: #3f3;
+          left: 0.1rem;
+        }
+        &--checked{
+          &::after{
+            visibility: visible;
+          }
+
+        }
+      }
+    }
+  }
+
+  #bet-on-fighter, #manager-options{
+    position: relative;
+    z-index: 1;
+    width: 50%;
+    padding: 1rem;  
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+
+    h3{
+      text-shadow: -1px 1px 2px #000;
+    }
+    &.disabled{
+      pointer-events: none;
+      filter: blur(0.1rem) grayscale(80%);
+    }
+  }
+  #bet-on-fighter{
+    .fighter-panel{
+      padding: .5rem;
+      width: 48%;
+      display: inline-block;
+      box-sizing: border-box;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #333;
+      margin: 1%;
+      box-shadow: -1px 2px 4px 1px #000;
+      &--active{
+        border-color: #3f3;
+      }
+
+      &__image{
+        margin: 1rem auto 1rem;
+        display: block;
+        
+      }
+      &__bet-button{
+        font-size: .7rem;
+        width: 31%;
+        margin: 0 1%;
+        outline: none;
+        &--active{
+          border-color: #3f3;
+          background-color: #3f3;
+        }
+      }
+    }
+  }
+}

@@ -1,1 +1,0 @@
-export type FighterStates = 'knocked out' | 'active'

@@ -1,25 +1,32 @@
-import { Component, Prop } from '@stencil/core';
-import { GameSkeleton } from '../../../models/game-skeleton';
+import { Component, State } from '@stencil/core';
+import { WebsocketService } from '../../websocket.service';
+import { ServerToClient } from '../../../models/app/serverToClient';
+import { GameSkeleton } from '../../../models/game/game-skeleton';
 
 @Component({
 	tag: 'game-component',
 	shadow: true
 })
 export class GameComponent {
-	@Prop() game: GameSkeleton
+	@State() game: GameSkeleton = {
+		players: null,
+		manager: null,
+		fighters: null,
+
+	}
+	websocketService: WebsocketService
+
+	componentDidLoad(){
+		this.websocketService = WebsocketService.SingletonInstance
+		this.websocketService.serverToClientSubject.subscribe((serverToClient: ServerToClient) => {
+			if(serverToClient.name == 'game update')
+        this.game = serverToClient.data
+    })
+	}
 
 	render() {
-		return ([
-			this.game.round.stage == 'pre-fight' &&
-				<pre-fight-component manager={this.game.manager} fighters={this.game.round.fighters}></pre-fight-component>,
-			this.game.round.stage == 'news' &&
-				<news-component></news-component>,
-			this.game.round.stage == 'fight in progress' &&
-				<fight-component></fight-component>,
-			this.game.round.stage == 'post-fight' &&
-				<post-fight-component></post-fight-component>
-		])
-		
+		return this.game && <round-component manager={this.game.manager} allFighters={this.game.fighters}></round-component>
 	}
 }
+
 

@@ -1,50 +1,72 @@
-import { RoundNews } from "../../../models/roundNews";
 import { Fighter } from "../fighter/fighter";
-import { Subject } from 'rxjs'
-import { Fight } from "../fight/fight";
-import { RoundStages } from "../../../models/round-stages";
+import { RoundStages } from "../../../types/game/round-stages";
+import { PreFight } from "./pre-fight/pre-fight";
+import { News } from "./news/news";
+import { Fight } from "./fight/fight";
+import { PostFight } from "./post-fight/post-fight";
+import { Player } from "../../../models/app/player";
+import { RoundSkeleton } from "../../../models/game/round-skeleton";
 
 export class Round {
-  stage: RoundStages
-  stateSubject: Subject<RoundStages> = new Subject();
-  roundNumber: number;
-  fighters: Fighter[]; 
-  fight: Fight;
-  private preFightTimer = 20;
-  private roundNews: RoundNews[] = [];
-  constructor(fighters: Fighter[], roundNumber) {
-    this.fighters = fighters
-    this.roundNumber = roundNumber;
-    this.doPrefight()
-      .then(this.doNews)
-      .then(this.doFightDay)
+   
+  private stage: RoundStages
+  private roundFinished
+  number: number
+
+  preFight: PreFight
+  news: News
+  fight: Fight
+  postFight: PostFight
+
+  constructor(number: number, private players: Player[], private fighters: Fighter[]){
+    this.number = number
+    this.preFight = new PreFight(this.players)
+    this.news = new News()
+    this.fight = new Fight(this.players, this.fighters)
+    this.postFight = new PostFight(this.players, this.fighters)
   }
 
-  private doPrefight() {
-    this.updateStage('pre-fight')
-    return new Promise(resolve => setTimeout(() => resolve, this.preFightTimer * 1000))
-  }
-
-  private updateStage(stage: RoundStages) {
-    this.stage = stage;
-    this.stateSubject.next(this.stage)
-  }
-
-  private async doNews() {
-    this.updateStage('news')
-    for (let i = 0; i < this.roundNews.length; i++) {
-      await this.showNewsItem(this.roundNews[i])
-    }
-  }
-  private showNewsItem(newsItem: RoundNews): Promise<any> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(), newsItem.duration * 1000)
+  private sendRoundUpdateToClients(){    
+    const roundSkeleton: RoundSkeleton = this.getRoundSkeleton()
+    this.players.forEach((player: Player) => {
+      player.sendToClient({name:'round update', data: roundSkeleton})
     })
   }
 
-  private doFightDay() {
-    this.updateStage('fight in progress')
+  start(): Promise<any>{
+    this.updateStage('pre-fight')
+    this.preFight.start()
+    .then(() => {
+      this.updateStage('news')
+      this.news.start()
+      .then(() => {
+        this.updateStage('fight')
+        this.fight.start()
+        .then(() => {
+          this.updateStage('post-fight')
+          this.postFight.start(this.fight.winner)
+          .then(() => {
+            this.roundFinished()
+          })
+        })
+      })
+    })
+    
+    return new Promise(resolve => this.roundFinished = resolve);
   }
 
+  private updateStage(stage: RoundStages) {
+    this.stage = stage
+    console.log(`Round Stage: ${stage}`);
+    this.sendRoundUpdateToClients()
+  }
+
+  getRoundSkeleton(): RoundSkeleton{
+    return {
+      fighters: this.fighters.map((fighter: Fighter) => fighter.getFighterSkeleton()),
+      stage: this.stage,
+      number: this.number
+    }
+  }
 
 }

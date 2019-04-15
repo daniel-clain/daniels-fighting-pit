@@ -7,13 +7,26 @@
 
   Any global CSS variables should also be applied here.
 */
+@import url('https://fonts.googleapis.com/css?family=Permanent+Marker');
+@import url('https://fonts.googleapis.com/css?family=Patrick+Hand|Permanent+Marker');
 
+html, body{
+  height: 100%;
+}
 
 body {
   margin: 0px;
   padding: 0px;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-  background: #000;
+  font-family: 'Patrick Hand';
+  background: #111;
   overflow: hidden;
   color: white;
+
 }
+
+
+button{
+  font-family: 'Patrick Hand';
+}
+
+

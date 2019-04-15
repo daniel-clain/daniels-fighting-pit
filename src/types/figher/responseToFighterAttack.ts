@@ -1,0 +1,1 @@
+export type ResponseToFighterAttack = 'dodged' | 'blocked' | 'take hit' | 'take critical hit'

@@ -1,14 +1,13 @@
 
 import io from 'socket.io-client';
 import { Subject } from "rxjs";
-import { ConnectionStates } from "../types/connectionStates";
-import { QueueingStates } from "../types/queueingStates";
-import { GameSkeleton } from '../models/game-skeleton';
+import { ConnectionStates } from "../types/app/connectionStates";
+import { QueueingStates } from "../types/app/queueingStates";
 import { LocalStorageService } from './local-storage.service';
-import { PlayerConnectInfo } from '../models/playerRegistration';
-import { ClientToServer } from '../models/clientToServer';
-import { ServerToClient } from '../models/serverToClient';
-import { ServerToClientName } from '../types/serverToClientName';
+import { ServerToClientName } from '../types/app/serverToClientName';
+import { ServerToClient } from '../models/app/serverToClient';
+import { PlayerConnectInfo } from '../models/app/playerConnectInfo';
+import { ClientToServer } from '../models/app/clientToServer';
 
 export class WebsocketService{
   private static instance: WebsocketService
@@ -17,7 +16,6 @@ export class WebsocketService{
   connectionStatusSubject: Subject<ConnectionStates> = new Subject()
   queueingStatusSubject: Subject<QueueingStates> = new Subject()
   serverToClientSubject: Subject<ServerToClient> = new Subject()
-  activeGameSubject: Subject<GameSkeleton> = new Subject()  
   server
 
   static get SingletonInstance(){
@@ -75,15 +73,14 @@ export class WebsocketService{
 
   handleClientMessages(){
     this.server.on('server to client', (serverToClient: ServerToClient) => {
+      console.log(`serverToClient: ${serverToClient.name}`)
       this.serverToClientSubject.next(serverToClient)
-      if(serverToClient.name == 'game started'){
-        this.activeGameSubject.next(serverToClient.data)
-      }
     })
   }
 
   sendMessageToServer(clientToServer: ClientToServer){
     clientToServer.clientId = this.localStorageService.clientId
+    clientToServer.gameId = this.localStorageService.gameId
     this.server.emit('client to server', clientToServer)
   }
 

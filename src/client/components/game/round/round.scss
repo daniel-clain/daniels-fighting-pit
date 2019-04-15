@@ -1,0 +1,9 @@
+#round{
+  height: 100%;
+  &__number{
+    padding: 0.5rem 1rem;
+    border-bottom: 2px #3a3a3a solid;
+    box-shadow: 2px 0px 5px 2px #000;
+    background-color: #101415;
+  }
+}

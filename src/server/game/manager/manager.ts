@@ -1,28 +1,16 @@
 import { Fighter } from "../fighter/fighter";
-import { ManagerOption } from "../../../models/managerOptions";
+import { Bet } from "../../../models/game/bet";
+import { ManagerOption } from "../../../models/game/managerOptions";
 
 export class Manager{  
   retired: boolean = false
   money: number = 500
   sponsoredFighters: Fighter[] = []
-  options: ManagerOption[] = [
-    {
-      name: 'Train fighter',
-      cost: 20,
-      effect: figher => this.trainFighter(figher)
-    }
-  ]
+  actionPoints = 3
+  options: ManagerOption[]
+  bet: Bet
 
-
-  trainFighter(fighter: Fighter){
-    fighter.strength ++
-    fighter.speed ++
-    fighter.aggression ++
-    fighter.intelligence ++
-    fighter.stamina ++
-    fighter.spirit ++
-    fighter.maxStamina ++
-    fighter.maxStamina ++
+  constructor(managerOptions: ManagerOption[]){
+    this.options = managerOptions
   }
-
 }

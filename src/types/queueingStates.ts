@@ -1,1 +1,0 @@
-export type QueueingStates = 'not queueing' | 'in que' | 'game available' | 'waiting for others to accept'
