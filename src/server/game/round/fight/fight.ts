@@ -5,6 +5,7 @@ import { Player } from "../../../../models/app/player";
 import { ArenaDimensions } from "../../../../models/fighter/arena-dimensions";
 import { random } from "../../../../helper-functions/helper-functions";
 import { Subscription } from "rxjs";
+import { FighterModelImage } from "../../../../models/fighter/fighterModelImage";
 
 export class Fight {
   winner: Fighter
@@ -52,7 +53,9 @@ export class Fight {
       fighter.spirit = 0
       fighter.stamina = fighter.maxStamina
       fighter.position.x = random(this.arenaDimensions.width) + this.arenaDimensions.outFromLeft
-      fighter.position.y = random(this.arenaDimensions.height) + this.arenaDimensions.upFromBottom
+      const modelHeight: number = fighter.fighterModelImages.find((image: FighterModelImage) => image.modelState == 'active').dimensions.height
+      fighter.position.y = random(this.arenaDimensions.height - modelHeight) + this.arenaDimensions.upFromBottom + modelHeight
+      fighter.otherFightersInTheFight = []
     })
   }
 

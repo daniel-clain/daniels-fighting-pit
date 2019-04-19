@@ -1,6 +1,5 @@
 import { FacingDirection } from "../../../types/figher/facingDirection";
 import { FighterModelStates } from "../../../types/figher/fighterModelStates";
-import { FighterStates } from "../../../types/figher/fighterStates";
 import { Subject } from "rxjs";
 import { MajorActions } from "../../../types/figher/majorActions";
 import { MinorActions } from "../../../types/figher/minorActions";
@@ -430,6 +429,9 @@ export class Fighter {
       debugger
     const closestFighter: Fighter = this.getClosestFighterInfrontOfYou()
     if(this.minorActionInProgress){
+      if(!closestFighter){
+        debugger
+      }
       this.cancelMinorAction(`${closestFighter.name} is close`)
     }
     this.respondToFighter(closestFighter)
