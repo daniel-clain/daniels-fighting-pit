@@ -22,7 +22,6 @@ export class Fighter {
 	facingDirection: FacingDirection
 	modelState: FighterModelStates
   name: string
-  state: FighterStates
   maxStamina = 5
   maxSpirit = 10
   knockedOut = false
