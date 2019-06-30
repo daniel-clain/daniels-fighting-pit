@@ -1,6 +1,5 @@
 import { FacingDirection } from "../../../types/figher/facingDirection";
 import { FighterModelStates } from "../../../types/figher/fighterModelStates";
-import { FighterStates } from "../../../types/figher/fighterStates";
 import { Subject } from "rxjs";
 import { MajorActions } from "../../../types/figher/majorActions";
 import { MinorActions } from "../../../types/figher/minorActions";
@@ -23,7 +22,6 @@ export class Fighter {
 	facingDirection: FacingDirection
 	modelState: FighterModelStates
   name: string
-  state: FighterStates
   maxStamina = 5
   maxSpirit = 10
   knockedOut = false
@@ -428,6 +426,9 @@ export class Fighter {
     if(this.minorActionInProgress == 'retreating')
       debugger
     if(this.minorActionInProgress){
+      if(!closestFighter){
+        debugger
+      }
       this.cancelMinorAction(`${closestFighter.name} is close`)
     }
     this.respondToFighter(closestFighter)
