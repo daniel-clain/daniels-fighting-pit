@@ -3,7 +3,6 @@ import { WebsocketService } from './websocket.service';
 import { ConnectionStates } from '../types/app/connectionStates';
 import { LocalStorageService } from './local-storage.service';
 import { ServerToClient } from '../models/app/serverToClient';
-import { GameSkeleton } from '../models/game/game-skeleton';
 
 @Component({
   tag: 'daniels-fighting-pit',
@@ -59,13 +58,9 @@ export class DanielsFightingPit {
 
   render() {
     return (
-      !this.name ? 
-        <set-name-component></set-name-component> 
-      : this.connectionStatus != 'connected' ? 
-          <not-connected-component></not-connected-component>
-        : !this.gameActive ? 
-            <pre-game-lobby-component></pre-game-lobby-component>
-          : <game-component></game-component>
+      this.gameActive ? 
+        <game-component></game-component>
+      : <pre-game-component connectionStatus={this.connectionStatus} name={this.name}></pre-game-component>
     )
   }
 }

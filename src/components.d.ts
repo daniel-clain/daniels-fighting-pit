@@ -24,6 +24,9 @@ import {
   ClientToServer,
 } from './models/app/clientToServer';
 import {
+  ConnectionStates,
+} from './types/app/connectionStates';
+import {
   Fighter,
 } from './server/game/fighter/fighter';
 
@@ -85,6 +88,15 @@ export namespace Components {
   interface PreGameLobbyComponent {}
   interface PreGameLobbyComponentAttributes extends StencilHTMLAttributes {}
 
+  interface PreGameComponent {
+    'connectionStatus': ConnectionStates;
+    'name': string;
+  }
+  interface PreGameComponentAttributes extends StencilHTMLAttributes {
+    'connectionStatus'?: ConnectionStates;
+    'name'?: string;
+  }
+
   interface DanielsFightingPit {}
   interface DanielsFightingPitAttributes extends StencilHTMLAttributes {}
 
@@ -108,6 +120,7 @@ declare global {
     'SetNameComponent': Components.SetNameComponent;
     'NotConnectedComponent': Components.NotConnectedComponent;
     'PreGameLobbyComponent': Components.PreGameLobbyComponent;
+    'PreGameComponent': Components.PreGameComponent;
     'DanielsFightingPit': Components.DanielsFightingPit;
     'FighterModel': Components.FighterModel;
   }
@@ -123,6 +136,7 @@ declare global {
     'set-name-component': Components.SetNameComponentAttributes;
     'not-connected-component': Components.NotConnectedComponentAttributes;
     'pre-game-lobby-component': Components.PreGameLobbyComponentAttributes;
+    'pre-game-component': Components.PreGameComponentAttributes;
     'daniels-fighting-pit': Components.DanielsFightingPitAttributes;
     'fighter-model': Components.FighterModelAttributes;
   }
@@ -188,6 +202,12 @@ declare global {
     new (): HTMLPreGameLobbyComponentElement;
   };
 
+  interface HTMLPreGameComponentElement extends Components.PreGameComponent, HTMLStencilElement {}
+  var HTMLPreGameComponentElement: {
+    prototype: HTMLPreGameComponentElement;
+    new (): HTMLPreGameComponentElement;
+  };
+
   interface HTMLDanielsFightingPitElement extends Components.DanielsFightingPit, HTMLStencilElement {}
   var HTMLDanielsFightingPitElement: {
     prototype: HTMLDanielsFightingPitElement;
@@ -211,6 +231,7 @@ declare global {
     'set-name-component': HTMLSetNameComponentElement
     'not-connected-component': HTMLNotConnectedComponentElement
     'pre-game-lobby-component': HTMLPreGameLobbyComponentElement
+    'pre-game-component': HTMLPreGameComponentElement
     'daniels-fighting-pit': HTMLDanielsFightingPitElement
     'fighter-model': HTMLFighterModelElement
   }
@@ -226,6 +247,7 @@ declare global {
     'set-name-component': HTMLSetNameComponentElement;
     'not-connected-component': HTMLNotConnectedComponentElement;
     'pre-game-lobby-component': HTMLPreGameLobbyComponentElement;
+    'pre-game-component': HTMLPreGameComponentElement;
     'daniels-fighting-pit': HTMLDanielsFightingPitElement;
     'fighter-model': HTMLFighterModelElement;
   }

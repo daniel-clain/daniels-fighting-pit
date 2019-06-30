@@ -4,6 +4,7 @@ import { ConnectionStates } from "../../../../types/app/connectionStates";
 
 @Component({
   tag: 'not-connected-component',
+  styleUrl: 'not-connected.scss',
   shadow: true
 })
 export class NotConnectedComponent{

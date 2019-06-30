@@ -1,0 +1,46 @@
+
+.pre-game{
+
+  width: 80%;
+  margin: auto;
+  padding: 2rem 0;
+  height: 100%;
+  min-width: 500px;
+
+  &__background{
+    background-image: url('.//assets/main-bg.jpg');
+    background-repeat: no-repeat; 
+    background-size: 100% auto;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    margin: auto;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    min-width: 626px;
+  }
+
+  &__container{
+    &__content{
+      position: relative;
+      z-index: 2;
+      border: 3px outset #3797c1;
+      padding: 2rem 3rem;
+      background-color: #3797c147;
+      box-shadow: 2px 2px 2px 2px #000;
+      min-height: 10rem;
+
+    }
+    &__heading{
+      position: relative;
+      z-index: 2;
+      font-size: 3rem;
+      color: #3797c1;
+      margin-bottom: 2rem;
+      text-shadow: 2px 2px 2px #1d4454;
+      font-family: 'Permanent Marker';
+    }
+  }
+}

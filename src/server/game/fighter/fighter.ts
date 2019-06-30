@@ -365,16 +365,15 @@ export class Fighter {
     }
   }
 
-  getCloseFightersInfrontOfYou(): Fighter[]{
+  getCloseFightersInfrontOfYou(): Fighter{
     const fightersInfrontOfYou: Fighter[] = this.facingDirection == 'left' ?
     this.fightersToTheLeft : this.fightersToTheRight
 
-    const closeFightersInfrontOfYou: Fighter[] = fightersInfrontOfYou.filter((fighter: Fighter) => {
+    const closeFighterInfrontOfYou: Fighter = fightersInfrontOfYou.find((fighter: Fighter) => {
       const fighterProximity = this.getFighterProximity(fighter)
       return fighterProximity == 'close'
     }) 
-
-    return closeFightersInfrontOfYou
+      return closeFighterInfrontOfYou
   }
 
   chanceToLookBehind(): boolean{
@@ -401,18 +400,18 @@ export class Fighter {
     this.removeKnockedOutFighters()
     if(!this.majorActionInProgress && this.minorActionInProgress != 'retreating' && !this.knockedOut){
       this.lookAtAllFightersInfrontOfYou()
-      let closeFightersInfrontOfYou1: Fighter[] = this.getCloseFightersInfrontOfYou()
-      if(closeFightersInfrontOfYou1.length != 0){
-        this.respondToCloseFighter()
+      let closeFighterInfrontOfYou: Fighter= this.getCloseFightersInfrontOfYou()
+      if(closeFighterInfrontOfYou){
+        this.respondToCloseFighter(closeFighterInfrontOfYou)
       }
       else {
         const lookBehind = this.chanceToLookBehind()
         if(lookBehind){
           this.turnAround()
           this.lookAtAllFightersInfrontOfYou()
-          let closeFightersInfrontOfYou2: Fighter[] = this.getCloseFightersInfrontOfYou()
-          if(closeFightersInfrontOfYou2.length != 0){
-            this.respondToCloseFighter()
+          let closeFighterInfrontOfYou: Fighter= this.getCloseFightersInfrontOfYou()
+          if(closeFighterInfrontOfYou){
+            this.respondToCloseFighter(closeFighterInfrontOfYou)
           }
           else {
             this.respondToNoCloseFighter()            
@@ -425,10 +424,9 @@ export class Fighter {
     }
   }
 
-  respondToCloseFighter(){
+  respondToCloseFighter(closestFighter: Fighter){
     if(this.minorActionInProgress == 'retreating')
       debugger
-    const closestFighter: Fighter = this.getClosestFighterInfrontOfYou()
     if(this.minorActionInProgress){
       this.cancelMinorAction(`${closestFighter.name} is close`)
     }
